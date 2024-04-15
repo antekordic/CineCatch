@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 100px;
+  background: #efefef;
+}
+
+.content {
+  display: flex;
+}
+
+.aside {
+  width: 250px;
+}
+
+.main {
+  flex: 1;
+}
