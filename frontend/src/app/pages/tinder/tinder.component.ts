@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { MOVIES_MOCK } from '../../mocks/movies.mock';
+import { MovieComponent } from '../movie/movie.component';
+
 
 @Component({
   selector: 'app-tinder',
