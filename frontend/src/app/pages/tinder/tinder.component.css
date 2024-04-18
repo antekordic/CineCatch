@@ -1,0 +1,39 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    justify-content: center;
+    direction: rtl
+}
+
+.container .rating label{
+    display: inline-block;
+    cursor: pointer;
+    color: #616356;
+    
+}
+
+.container .rating label i {
+    font-size: 3rem;
+    transition: 0.1s ease-in;
+}
+
+.container .rating:hover i,
+.container .rating:hover ~ .rating i {
+    color: #ffea4e;
+}
+
+.container .rating .rating-radio {
+    display: none;
+}
+
+.container .rating input[type="radio"]:checked + .rating,
+.container .rating input[type="radio"]:checked ~ .rating {
+    color: #ffea4e;
+}
