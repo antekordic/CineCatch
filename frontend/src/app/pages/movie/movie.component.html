@@ -1,0 +1,7 @@
+<p>movie works!</p>
+
+@if (movie$ | async; as movie) {
+  <pre>{{ movie | json }}</pre>
+} @else {
+  No movie found!
+}
