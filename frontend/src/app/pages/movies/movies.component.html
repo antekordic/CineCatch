@@ -1,0 +1,9 @@
+<p>movies works!</p>
+
+Movies Filter {{watchedFilter$ | async}}
+
+<ul>
+  @for(movie of movies$ | async; track movie.id) {
+    <li><a [routerLink]="['/movies', movie.id]">{{ movie.title }}</a></li>
+  }
+</ul>

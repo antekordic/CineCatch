@@ -3,17 +3,18 @@
 FROM node:21-alpine
 
 # Create an environment variable for MongoDB URI
-ENV MONGODB_URI='mongodb://localhost:27017/realestate'
+# ENV MONGODB_URI='mongodb://localhost:27017/realestate'
+
+# Copy the contents of the project folder into the working directory of
+# docker image
+#first dot is the current direstory, and the second is the path to the container directory 
+COPY backend usr/src/app/
+COPY frontend usr/src/app/
 
 # Set working directory for the project to /usr/src/app
 # NOTE: all the directives that follow in the Dockerfile will be executed
 # in working directory.
 WORKDIR /usr/src/app
-
-# Copy the contents of the project folder into the working directory of
-# docker image
-#first dot is the current direstory, and the second is the path to the container directory 
-COPY . /usr/src/app/
 
 RUN npm install
 
