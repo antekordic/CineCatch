@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import {filter, map, Observable, of, tap} from "rxjs";
 import {Movie} from "../interfaces/movie.interface";
 import {MOVIES_MOCK} from "../mocks/movies.mock";
+import {MOVIES_URL} from "../shared/constants/urls";
+
 
 @Injectable({
   providedIn: 'root'
