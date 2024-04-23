@@ -4,36 +4,37 @@
     box-sizing: border-box;
 }
 
-.container {
+.icons {
     display: flex;
-    flex-direction: row;
     text-align: center;
     justify-content: center;
+}
+
+.container {
+    flex-direction: row;
     direction: rtl
 }
 
-.container .rating label{
+label{
     display: inline-block;
-    cursor: pointer;
     color: #616356;
-    
 }
 
-.container .rating label i {
+label i {
     font-size: 3rem;
     transition: 0.1s ease-in;
 }
 
-.container .rating:hover i,
-.container .rating:hover ~ .rating i {
+.container label:hover i,
+.container label:hover ~ label i {
     color: #ffea4e;
 }
 
-.container .rating .rating-radio {
+.radio {
     display: none;
 }
 
-.container .rating input[type="radio"]:checked + .rating,
-.container .rating input[type="radio"]:checked ~ .rating {
+.container input[type="radio"]:checked + label i,
+.container input[type="radio"]:checked ~ label i {
     color: #ffea4e;
 }
