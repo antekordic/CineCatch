@@ -29,7 +29,7 @@ router.get("/seed", asynceHandler(
   router.get("/search/:searchTerm", asynceHandler(
     async (req, res) => {
       const searchRegex = new RegExp(req.params.searchTerm, 'i');
-      const movies = await MovieModel.find({name: {$regex:searchRegex}})
+      const movies = await MovieModel.find({title: {$regex:searchRegex}})
       res.send(movies);
     }
   ))
