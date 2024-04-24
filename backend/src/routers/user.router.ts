@@ -42,7 +42,7 @@ router.post('/register', asyncHandler(
     const user = await UserModel.findOne({email});
     if(user){
       res.status(HTTP_BAD_REQUEST)
-      .send('User is already exist, please login!');
+      .send('User already exist, please login!');
       return;
     }
 
@@ -53,7 +53,6 @@ router.post('/register', asyncHandler(
       name,
       email: email.toLowerCase(),
       password: encryptedPassword,
-      address,
       isAdmin: false
     }
 
@@ -73,7 +72,6 @@ router.post('/register', asyncHandler(
       id: user.id,
       email: user.email,
       name: user.name,
-      address: user.address,
       isAdmin: user.isAdmin,
       token: token
     };
