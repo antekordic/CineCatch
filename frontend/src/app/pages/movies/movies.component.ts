@@ -41,7 +41,6 @@ export class MoviesComponent {
       if (watchedFilter === false) {
         return this.moviesService.loadUnwatchedMovies();
       }
-      console.log("bla")
       return this.moviesService.loadAllMovies();
     })
   )
