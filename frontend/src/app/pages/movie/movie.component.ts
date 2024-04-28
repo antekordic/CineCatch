@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {map, Observable, switchMap} from "rxjs";
+import {map, Observable, shareReplay, switchMap, tap} from "rxjs";
 import {Movie} from "../../interfaces/movie.interface";
 import {MoviesService} from "../../services/movies.service";
 import {AsyncPipe, JsonPipe} from "@angular/common";
@@ -24,6 +24,7 @@ export class MovieComponent {
   );
 
   public movie$: Observable<Movie | null> = this.movieId$.pipe(
+    tap(console.info),
     switchMap(movieId => this.moviesService.getMovieById(movieId)),
   );
 }

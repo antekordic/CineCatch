@@ -12,7 +12,7 @@ export const sample_movies: any[] = [
   watched: false,
   saved: false,
 }, {
-  id: "2",
+  id: 2,
   title: 'Machete Kills!',
   year: 2005,
   genre: 'action',
