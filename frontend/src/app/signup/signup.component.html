@@ -1,0 +1,29 @@
+<p>signup works!</p>
+
+
+<h1>Anmelden</h1>
+
+<div>
+        
+    <h2>Signup</h2>
+    <p>Create an account!</p>
+
+    <form [formGroup]="signUpForm" (ngSubmit)="signUp()">
+        <label for="email">Email</label>
+        <input required type="email" name="email" placeholder="Email">
+
+        <label for="password">Password</label>
+        <input required type="password" name="password" placeholder="Password">
+
+        <label for="repeatPassword">Repeat Password</label>
+        <input required type="password" name="repeatPassword" placeholder="Repeat Password">
+
+        <button type="submit" name="cancel">Cancel</button>
+
+        <button type="submit" name="submit">Submit</button>
+
+        <span>Already have an account? 
+            <a routerLink="/login">Sign in</a></span>
+    </form>
+
+</div>
