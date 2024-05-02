@@ -2,3 +2,6 @@
   <input type="text" formControlName="query" />
   <button [disabled]="searchForm.invalid" type="submit">Search</button>
 </form>
+<div>
+  LoggedIn: {{ loggedIn$ | async }}
+</div>

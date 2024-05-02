@@ -4,17 +4,23 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {map, Observable, of, switchMap} from "rxjs";
 import {ActivatedRoute, RouterModule} from "@angular/router";
-import { USER_LOGIN_URL } from '../shared/constants/urls';
+import { USER_LOGIN_URL } from '../../shared/constants/urls';
+import { AuthService } from '../../services/auth.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, AsyncPipe],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
   public loginForm!: FormGroup
+
+  private readonly authService = inject(AuthService);
+
+  public loggedIn$ = this.authService.loggedIn$;
 
   constructor(private formbuilder: FormBuilder,private http: HttpClient, private router: Router) { }
 
@@ -40,6 +46,14 @@ export class LoginComponent {
     },err=>{
       alert("Something went wrong")
     })
+  }
+
+  public fakeLogin() {
+    this.authService.login('quatsch', 'passwort');
+  }
+
+  public fakeLogout() {
+    this.authService.logout();
   }
 
 }
