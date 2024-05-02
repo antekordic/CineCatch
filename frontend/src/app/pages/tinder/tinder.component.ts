@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MOVIES_MOCK } from '../../mocks/movies.mock';
 import { MovieComponent } from '../movie/movie.component';
+import { HttpClientModule } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -11,5 +13,4 @@ import { MovieComponent } from '../movie/movie.component';
   styleUrl: './tinder.component.css'
 })
 export class TinderComponent {
-
-}
+} 

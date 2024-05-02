@@ -4,10 +4,21 @@
     box-sizing: border-box;
 }
 
+.box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.plot {
+    background-color: #ffea4e;
+}
+
 .icons {
     display: flex;
     text-align: center;
     justify-content: center;
+    width: 70%;
 }
 
 .container {
