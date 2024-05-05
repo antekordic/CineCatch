@@ -1,16 +1,14 @@
 <p>movie-information works!</p>
 
-@if (movie$ | async; as movie) {
-    <h1>{{ movie.title }}</h1>
-  
-    <video>{{movie.trailerUrl }}</video>
+<h2> {{ movie.title}}</h2>
+<div class="box">
+    <div class="trailer">
+        <iframe width="560" height="315" [src]="youtubeUrl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
 
-    <div>
-        <b>{{movie.genre}}, {{movie.director}} </b> <br/>
+    <div class="plot">
+        <h3>{{movie.genre}}, {{movie.director}} </h3> <br/>
         {{movie.plot}}
     </div>
-    
-    <pre>{{ movie | json }}</pre>
-  } @else {
-    No movie found!
-  }
+</div>
+<pre>{{ movie | json }}</pre>

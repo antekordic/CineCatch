@@ -1,15 +1,10 @@
 <p>tinder works!</p>
 
 <div class="box">
-   <div class="trailer">
-      <h2>Filmtitel</h2>
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/xy8aJw1vYHo?si=pGghoDlfeoJuXStp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-   </div>
 
-   <div class="plot">
-      <h2>Filminfos</h2>
-      <p>Lorem ipsum dolor sit amet </p>
-   </div>
+   @if (movie$ | async; as movie) {
+      <app-movie-information [movie]="movie" />
+   }
 
    <div class="icons">  
 
