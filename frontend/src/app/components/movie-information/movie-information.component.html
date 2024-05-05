@@ -1,0 +1,16 @@
+<p>movie-information works!</p>
+
+@if (movie$ | async; as movie) {
+    <h1>{{ movie.title }}</h1>
+  
+    <video>{{movie.trailerUrl }}</video>
+
+    <div>
+        <b>{{movie.genre}}, {{movie.director}} </b> <br/>
+        {{movie.plot}}
+    </div>
+    
+    <pre>{{ movie | json }}</pre>
+  } @else {
+    No movie found!
+  }
