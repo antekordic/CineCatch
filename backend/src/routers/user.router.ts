@@ -38,7 +38,7 @@ router.post("/login", asyncHandler(
   
 router.post('/register', asyncHandler(
   async (req, res) => {
-    const {name, email, password, address} = req.body;
+    const {email, password} = req.body;
     const user = await UserModel.findOne({email});
     if(user){
       res.status(HTTP_BAD_REQUEST)
@@ -50,10 +50,8 @@ router.post('/register', asyncHandler(
 
     const newUser:User = {
       id:'',
-      name,
       email: email.toLowerCase(),
       password: encryptedPassword,
-      isAdmin: false
     }
 
     const dbUser = await UserModel.create(newUser);
@@ -63,16 +61,14 @@ router.post('/register', asyncHandler(
 
   const generateTokenReponse = (user : User) => {
     const token = jwt.sign({
-      id: user.id, email:user.email, isAdmin: user.isAdmin
-    },process.env.JWT_SECRET!,{
+      id: user.id, email:user.email
+    },process.env.JWT_TOKEN!,{
       expiresIn:"30d"
     });
   
     return {
       id: user.id,
       email: user.email,
-      name: user.name,
-      isAdmin: user.isAdmin,
       token: token
     };
   }
