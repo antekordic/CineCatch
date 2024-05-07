@@ -1,8 +1,17 @@
 <p>movie works!</p>
 
 @if (movie$ | async; as movie) {
+  <app-movie-information [movie]="movie" />
+  Rating: {{movie.rating}}
+}
+
+<!-- 
+@if (movie$ | async; as movie) {
+  <h1>{{ movie.title }}</h1>
+
+
   <pre>{{ movie | json }}</pre>
 } @else {
   No movie found!
 }
-
+-->

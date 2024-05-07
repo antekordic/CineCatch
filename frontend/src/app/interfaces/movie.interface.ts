@@ -7,7 +7,7 @@ export interface Movie {
   plot: string,
   rating: number,
   imageUrl: string,
-  trailer: string;
+  trailerUrl: string;
   watched: boolean;
   saved: boolean;
 }

@@ -9,7 +9,7 @@ export const MOVIES_MOCK: Movie[] = [{
   plot: 'some description....',
   rating: 4,
   imageUrl: 'https://www.imdb.com/title/tt11016042/?ref_=fea_em00059_1_poster_sm',
-  trailer: 'https://youtu.be/GeKzBQnAq5I?feature=shared',
+  trailerUrl: 'https://youtu.be/GeKzBQnAq5I?feature=shared',
   watched: false,
   saved: false,
 }, {
@@ -21,7 +21,7 @@ export const MOVIES_MOCK: Movie[] = [{
   plot: 'some description....',
   rating: 4,
   imageUrl: 'https://www.imdb.com/title/tt11016042/?ref_=fea_em00059_1_poster_sm',
-  trailer: 'https://youtu.be/DwbG64YC-vQ?feature=shared',
+  trailerUrl: 'https://youtu.be/DwbG64YC-vQ?feature=shared',
   watched: false,
   saved: false,
 }, {
@@ -33,7 +33,7 @@ export const MOVIES_MOCK: Movie[] = [{
   plot: 'some description....',
   rating: 4,
   imageUrl: 'https://www.imdb.com/title/tt11016042/?ref_=fea_em00059_1_poster_sm',
-  trailer: 'https://youtu.be/Vl1q_uY9HXI?feature=shared',
+  trailerUrl: 'https://youtu.be/Vl1q_uY9HXI?feature=shared',
   watched: true,
   saved: false,
 }];
