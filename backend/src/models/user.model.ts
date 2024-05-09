@@ -1,13 +1,22 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const userSchema = new mongoose.Schema({
+export interface User extends Document {
+  name: string;
+  email: string;
+  password: string;
+  toWatch: string[];
+  watched: Map<string, number>;
+}
+
+// Definiert das Schema für den Benutzer
+
+const userSchema: Schema = new Schema({
+  name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  username: { type: String, required: true, unique: true },
-  toWatch: [{ type: String }],
-  watched: { type: Map, of: Number }
+  toWatch: [{ type: String }],          //towatch -> zu sehen
+  watched: { type: Map, of: Number }    //watched -> gesehen speichert mit bewertung
 });
 
-const User = mongoose.model('User', userSchema);
-
-export default User;
+// Erstellt das UserModel
+export const UserModel = mongoose.model<User>('User', userSchema);
