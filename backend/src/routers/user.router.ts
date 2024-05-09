@@ -73,5 +73,19 @@ router.post('/register', asyncHandler(
     };
   }
   
+//Änderung von Thorben, toWatch Router -> Rückgabe der noch zu sehenden Filme des Users
+
+router.get('/:userId/toWatch', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user.toWatch);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
   export default router;

@@ -1,22 +1,13 @@
-import {Schema, model} from "mongoose";
+import mongoose from 'mongoose';
 
-export interface User{
-    id:string;
-    email:string;
-    password:string;
-    }
-
-export const UserSchema = new Schema<User>({
-    email: {type: String, required: true, unique: true},
-    password: {type: String, required: true},
-    }, {
-        timestamps: true,
-        toJSON:{
-            virtuals: true
-        },
-        toObject:{
-            virtuals: true
-    }
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  toWatch: [{ type: String }],
+  watched: { type: Map, of: Number }
 });
-    
-export const UserModel = model<User>('user', UserSchema);
+
+const User = mongoose.model('User', userSchema);
+
+export default User;
