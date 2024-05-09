@@ -4,6 +4,7 @@ import {filter, map, Observable, of, tap} from "rxjs";
 import {Movie} from "../interfaces/movie.interface";
 import {MOVIES_MOCK} from "../mocks/movies.mock";
 import {MOVIES_BY_ID_URL, MOVIES_URL} from "../shared/constants/urls";
+import { urlToHttpOptions } from 'node:url';
 
 
 
@@ -39,4 +40,17 @@ export class MoviesService {
   public getMovieById(movieId: Movie['id']): Observable<Movie | null> {
     return this.http.get<Movie>(MOVIES_BY_ID_URL.replace(':id', movieId.toString()));
   }
+
+  /** 
+  public addMovieToWatchList(movie: Movie): Observable<Movie>{
+    return this.http.post<Movie>(this.MOVIES_BY_ID_URL, movie).pipe(
+     schauen ob film bereits in watched list 
+    )  
+  } 
+
+  public addRatingToMovie(movie: Movie): Observable<Movie>{
+    return this.http.post<Movie>(this.MOVIES_BY_ID_URL, movie).pipe(
+      value 1-5 von sternen hinzufügen
+    )
+  }*/
 }
