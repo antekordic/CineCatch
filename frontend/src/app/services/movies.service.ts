@@ -41,16 +41,13 @@ export class MoviesService {
     return this.http.get<Movie>(MOVIES_BY_ID_URL.replace(':id', movieId.toString()));
   }
 
-  /** 
+   
   public addMovieToWatchList(movie: Movie): Observable<Movie>{
-    return this.http.post<Movie>(this.MOVIES_BY_ID_URL, movie).pipe(
-     schauen ob film bereits in watched list 
-    )  
+    return this.http.post<Movie>(MOVIES_BY_ID_URL, movie);
   } 
 
+
   public addRatingToMovie(movie: Movie): Observable<Movie>{
-    return this.http.post<Movie>(this.MOVIES_BY_ID_URL, movie).pipe(
-      value 1-5 von sternen hinzufügen
-    )
-  }*/
+    return this.http.post<Movie>(MOVIES_BY_ID_URL, movie);
+  }
 }

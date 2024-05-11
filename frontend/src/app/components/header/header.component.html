@@ -1,6 +1,6 @@
 <h1> Cinephile Companion</h1>
 
 <form [formGroup]="searchForm" (ngSubmit)="submitSearchQuery()">
-  <input type="text" formControlName="query" />
+  <input type="text" formControlName="query" placeholder="What are you looking for..."/>
   <button [disabled]="searchForm.invalid" type="submit">Search</button>
 </form>
