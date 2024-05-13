@@ -5,6 +5,7 @@ import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { HTTP_BAD_REQUEST } from '../constants/http_status';
+import { addToWatch, addWatched } from '../user.controller';
 
 const router = Router();
 
@@ -104,5 +105,8 @@ const generateTokenReponse = (user: any) => {
     token: token
   };
 };
+
+router.post('/user/:userId/towatch/:movieId', addToWatch);
+router.post('/user/:userId/watched/:movieId/:rating', addWatched);
 
 export default router;
