@@ -1,4 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';  //Document ermöglicht Methoden wie save(), remove() und findbyid zu nutzen
+
+// Definiert das Interface User und gibt somit eine Struktur zur datenübergabe vor
 
 export interface User extends Document {
   name: string;
@@ -8,7 +10,7 @@ export interface User extends Document {
   watched: Map<string, number>;
 }
 
-// Definiert das Schema für den Benutzer
+// Definiert das Mongoose Schema für den Benutzer
 
 const userSchema: Schema = new Schema({
   name: { type: String, required: true },
