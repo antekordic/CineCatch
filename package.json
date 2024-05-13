@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^1.6.8",
     "jsonwebtoken": "^9.0.2"
   }
 }

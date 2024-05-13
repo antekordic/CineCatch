@@ -2,6 +2,7 @@ import {Router} from "express";
 import { sample_movies } from "../data";
 import asynceHandler from 'express-async-handler';
 import { MovieModel } from "../models/movie.model";
+import axios from "axios"; // npm install axios
 
 
 const router = Router();
@@ -34,11 +35,27 @@ router.get("/seed", asynceHandler(
     }
   ))
 
-  router.get("/:movieId", asynceHandler(
-    async (req, res) => {
-      const movie = await MovieModel.findById(req.params.movieId);
-      res.send(movie);
+  router.get("/:movieId", async (req, res) => {
+    try {
+        const movieId = req.params.movieId;
+        // TMDB API CALL AUF ID
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=YOUR_API_KEY`);
+        if (response.status === 200) {
+            res.json(response.data);
+        } else {
+            res.status(response.status).json({ error: "Failed to fetch movie details" });
+        }
+    } catch (error) {
+
+        res.status(500).json({ error: "Internal server error" });
     }
-  ))
+});
+
+//  router.get("/:movieId", asynceHandler(
+//    async (req, res) => {
+//      const movie = await MovieModel.findById(req.params.movieId);
+//      res.send(movie);
+//    }
+//  ))
 
 export default router;
