@@ -4,7 +4,7 @@ export interface User {
   id: string;
   email: string;
   password: string;
-  watchedMovies: string[];
+  watchedMovies: Array<{ movieId: string; rating?: number }>;
   watchLaterMovies: string[];
 }
 
@@ -12,7 +12,7 @@ export const UserSchema = new Schema<User>(
   {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    watchedMovies: [{ type: String }],
+    watchedMovies: [{ movieId: String, rating: Number }],
     watchLaterMovies: [{ type: String }],
   },
   {
