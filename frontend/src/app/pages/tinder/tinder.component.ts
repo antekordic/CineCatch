@@ -1,12 +1,13 @@
-import { Component, OnInit, inject, Input } from '@angular/core';
+import { Component, OnInit, inject, Input, OnDestroy } from '@angular/core';
 import { MovieComponent } from '../movie/movie.component';
 import { HttpClientModule } from '@angular/common/http';
-import {map, Observable, shareReplay, switchMap, tap} from "rxjs";
+import {map, Observable, shareReplay, Subscription, switchMap, tap} from "rxjs";
 import { MovieInformationComponent } from '../../components/movie-information/movie-information.component';
 import { MoviesService } from '../../services/movies.service';
 import { ActivatedRoute } from '@angular/router';
 import { Movie } from '../../interfaces/movie.interface';
 import { AsyncPipe, JsonPipe } from '@angular/common';
+import { response } from 'express';
 
 @Component({
   selector: 'app-tinder',
@@ -19,7 +20,9 @@ import { AsyncPipe, JsonPipe } from '@angular/common';
   templateUrl: './tinder.component.html',
   styleUrl: './tinder.component.css'
 })
-export class TinderComponent {
+export class TinderComponent implements OnDestroy {
+  private readonly subscription = new Subscription();
+
   private readonly route = inject(ActivatedRoute);
   private readonly moviesService = inject(MoviesService);
 
@@ -31,4 +34,28 @@ export class TinderComponent {
     tap(console.info),
     switchMap(movieId => this.moviesService.getMovieById(movieId)),
   );
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+ 
+  public addMovie(movie: Movie){
+    this.subscription.add(
+      this.moviesService.addMovieToWatchList(movie).subscribe({ 
+        next: response => {
+          console.log(response)
+        }
+      })
+    );
+  }
+
+  public rateMovie(movie: Movie){
+    this.subscription.add(
+      this.moviesService.addRatingToMovie(movie).subscribe({ 
+        next: response => {
+          console.log(response)
+        }
+      })
+    );
+  }
 } 

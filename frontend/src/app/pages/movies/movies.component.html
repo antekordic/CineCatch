@@ -4,7 +4,18 @@ Movies Filter {{watchedFilter$ | async}}
 
 <ul>
   @for(movie of movies$ | async; track movie.id) {
-    <li><a [routerLink]="['/movies', movie.id]">{{ movie.title }}</a></li>
+
+    <li>
+      <div class="container"> 
+        <div class="plakat-container">
+          <img class="plakat" :src="https://www.themoviedb.org/t/p/w1280/jy0CKGuj5gcWn6DAnJ4HEdUgjJO.jpg">
+        </div>
+        <div class="titel">
+          <a [routerLink]="['/movies', movie.id]">{{ movie.title }}</a> <br/>
+          {{movie.genre}}
+        </div>
+      </div>
+    </li>
   }
 </ul>
 

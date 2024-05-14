@@ -1,8 +1,54 @@
+
+
 h1 {
     text-align: center;
+    color: whitesmoke;
 }
 
 form {
     text-align: center;
-    
+    border-radius: 50%;
 }
+
+input, button {
+    border: 0;
+    color: darkslateblue;
+    font-size: 1.2rem;
+   
+  }
+
+  button {
+    
+  }
+
+/*
+-----
+
+ 
+  button {
+    display: none; // prevent being able to tab to it
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--btn-width);
+    font-weight: bold;
+    background: var(--color-brand);
+    border-radius: 0 var(--rad) var(--rad) 0;
+  }
+  input:not(:placeholder-shown) {
+    border-radius: var(--rad) 0 0 var(--rad);
+    width: calc(100% - var(--btn-width));
+    + button {
+      display: block;
+    }
+  }
+  label {
+    position: absolute;
+    clip: rect(1px, 1px, 1px, 1px);
+    padding: 0;
+    border: 0;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+  }
+  */
