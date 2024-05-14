@@ -20,3 +20,11 @@
     </form>
 
 </div>
+
+<div>
+    @if (loggedIn$ | async; as loggedIn) {
+        <button (click)="fakeLogout()">logout</button>
+      } @else {
+        <button (click)="fakeLogin()">login</button>
+      }
+</div>
