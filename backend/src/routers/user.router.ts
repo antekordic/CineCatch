@@ -106,7 +106,8 @@ const generateTokenReponse = (user: any) => {
   };
 };
 
-router.post('/user/:userId/towatch/:movieId', addToWatch);
-router.post('/user/:userId/watched/:movieId/:rating', addWatched);
+//leitet "Post"/Daten senden anfrage an die richtige funktion in der user.controller weiter
+router.post('/user/:userId/towatch/:movieId', addToWatch);        //leitet an die hinzufügen zur TOwatch Funktion in der user.controller.ts weiter
+router.post('/user/:userId/watched/:movieId/:rating', addWatched);//analog dazu leitet dies an die addWatched mit mehr parametern weiter
 
 export default router;
