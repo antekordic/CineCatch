@@ -4,14 +4,14 @@
 
    @if (movie$ | async; as movie) {
       <app-movie-information [movie]="movie" />
-   }
+   
 
    <div class="icons">  
 
       <input type="radio" name="toWatch" id="toWatch" class="radio" value="true">
       <label for="watch"><i class="fa-solid fa-eye"></i></label>
 
-      <div class="container">
+      <form formGroup="ratingForm" class="container" (ngSubmit)="rateMovie(movie)">
 
             <input type="radio" name="rating" id="star-5" class="radio" value="5">
             <label for="star-5"><i class="fa-solid fa-star"></i></label>
@@ -28,10 +28,10 @@
             <input type="radio" name="rating" id="star-1" class="radio" value="1">
             <label for="star-1"><i class="fa-solid fa-star"></i></label>
          
-      </div>
+      </form>
 
       <input type="radio" name="share" id="share" class="radio" value="">
       <label for="share"><i class="fa-solid fa-share-nodes"></i></label>
-   </div>
+   </div> 
+}
 </div>
-   <!-- https://youtu.be/OouXSXHXitY?feature=shared -->
