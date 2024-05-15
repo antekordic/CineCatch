@@ -1,16 +1,16 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { sample_users } from '../data';
-import { UserModel } from '../models/user.model';
-import asyncHandler from 'express-async-handler';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { HTTP_BAD_REQUEST } from '../constants/http_status';
-import { addToWatch, addWatched } from '../user.controller';
+import { Router } from "express";
+import { sample_users } from "../data";
+import jwt from "jsonwebtoken";
+import asyncHandler from "express-async-handler";
+import { User, UserModel } from "../models/user.model";
+import { HTTP_BAD_REQUEST } from "../constants/http_status";
+import bcrypt from "bcryptjs";
 
 const router = Router();
 
-router.get("/seed", asyncHandler(
-  async (req, res) => {
+router.get(
+  "/seed",
+  asyncHandler(async (req, res) => {
     const usersCount = await UserModel.countDocuments();
     if (usersCount > 0) {
       res.send("Seed is already done!");
@@ -19,95 +19,236 @@ router.get("/seed", asyncHandler(
 
     await UserModel.create(sample_users);
     res.send("Seed Is Done!");
-  }
-));
+  })
+);
 
-router.post("/login", asyncHandler(
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post(
+  "/login",
+  asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await UserModel.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.json(generateTokenReponse(user));
-      return; // Hinzugefügter Rückgabewert
+      res.send(generateTokenReponse(user));
     } else {
       res.status(HTTP_BAD_REQUEST).send("Username or password is invalid!");
-      return; // Hinzugefügter Rückgabewert
     }
-  }
-));
+  })
+);
 
-router.post('/register', asyncHandler(
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { name, email, password, toWatch = [], watched = new Map() } = req.body;
-    const userExists = await UserModel.findOne({ email });
-
-    if (userExists) {
-      res.status(HTTP_BAD_REQUEST).send('User already exists, please login!');
-      return; // Hinzugefügter Rückgabewert
+router.post(
+  "/register",
+  asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    const user = await UserModel.findOne({ email });
+    if (user) {
+      res.status(HTTP_BAD_REQUEST).send("User already exist, please login!");
+      return;
     }
 
     const encryptedPassword = await bcrypt.hash(password, 10);
-    const newUser = new UserModel({
-      name,
+
+    const newUser: User = {
+      id: "",
       email: email.toLowerCase(),
       password: encryptedPassword,
-      toWatch,
-      watched
-    });
+      watchedMovies: [],
+      watchLaterMovies: [],
+    };
 
-    const dbUser = await newUser.save();
-    res.json(generateTokenReponse(dbUser));
-    return; // Hinzugefügter Rückgabewert
-  }
-));
+    const dbUser = await UserModel.create(newUser);
+    res.send(generateTokenReponse(dbUser));
+  })
+);
 
-router.get('/user/:userId/towatch', asyncHandler(
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const userId = req.params.userId;
-    const user = await UserModel.findById(userId);
-
-    if (!user) {
-      res.status(HTTP_BAD_REQUEST).send('User not found!');
-      return; // Rückgabe von void
+const generateTokenReponse = (user: User) => {
+  const token = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    process.env.JWT_TOKEN!,
+    {
+      expiresIn: "30d",
     }
-
-    res.send(user.toWatch);
-    return; // Rückgabe von void
-  }
-));
-
-router.get('/user/:userId/watched', asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const userId = req.params.userId;
-    const user = await UserModel.findById(userId);
-
-    if (!user) {
-      res.status(HTTP_BAD_REQUEST).send('User not found!');
-      return; // Rückgabe von void
-    }
-
-    res.send(Array.from(user.watched.entries()));
-    return; // Rückgabe von void
-  }
-));
-
-const generateTokenReponse = (user: any) => {
-  const token = jwt.sign({
-    id: user.id, email: user.email
-  }, process.env.JWT_TOKEN!, {
-    expiresIn: "30d"
-  });
+  );
 
   return {
     id: user.id,
     email: user.email,
-    token: token
+    token: token,
   };
 };
 
-//leitet "Post"/Daten senden anfrage an die richtige funktion in der user.controller weiter
-router.post('/user/:userId/towatch/:movieId', addToWatch);        //leitet an die hinzufügen zur TOwatch Funktion in der user.controller.ts weiter
-router.post('/user/:userId/watched/:movieId/:rating', addWatched);//analog dazu leitet dies an die addWatched mit mehr parametern weiter
+// Define a route for adding movie IDs to the user's watched list
+router.post("/watched", async (req, res) => {
+  try {
+    const { email, movieId, rating } = req.body;
+
+    // Find the user by email
+    let user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if the movie ID already exists in the watched list
+    const existingMovie = user.watchedMovies.find(
+      (movie) => movie.movieId === movieId
+    );
+    if (existingMovie) {
+      return res
+        .status(400)
+        .json({ error: "Movie ID already exists in the watched list" });
+    }
+
+    // Add the movie ID and rating to the watched list and save the user
+    const newMovie: { movieId: string; rating?: number } = { movieId }; // Define newMovie with optional rating
+    if (rating !== undefined) {
+      newMovie.rating = rating;
+    }
+    user.watchedMovies.push(newMovie);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Movie ID added to watched list successfully",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Route for updating the rating of a watched movie
+router.put("/watched", async (req, res) => {
+  try {
+    const { email, movieId, rating } = req.body;
+
+    // Find the user by email
+    let user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the movie in the watched list
+    const movieIndex = user.watchedMovies.findIndex(
+      (movie) => movie.movieId === movieId
+    );
+    if (movieIndex === -1) {
+      return res
+        .status(404)
+        .json({ error: "Movie not found in the watched list" });
+    }
+
+    // Update the rating of the movie and save the user
+    user.watchedMovies[movieIndex].rating = rating;
+    await user.save();
+
+    res.json({ success: true, message: "Rating updated successfully" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Define a route for adding movie IDs to the user's watch later list
+router.post("/watchLater", async (req, res) => {
+  try {
+    const { email, movieId } = req.body;
+
+    // Find the user by email
+    let user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if the movie ID already exists in the watch later list
+    if (user.watchLaterMovies.includes(movieId)) {
+      return res
+        .status(400)
+        .json({ error: "Movie ID already exists in the watch later list" });
+    }
+
+    // Add the movie ID to the watch later list and save the user
+    user.watchLaterMovies.push(movieId);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Movie ID added to watch later list successfully",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Route for deleting a watched movie from the list
+router.delete("/watched", async (req, res) => {
+  try {
+    const { email, movieId } = req.body;
+
+    // Find the user by email
+    let user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the index of the movie in the watched list
+    const index = user.watchedMovies.findIndex(
+      (movie) => movie.movieId === movieId
+    );
+    if (index === -1) {
+      return res
+        .status(404)
+        .json({ error: "Movie not found in the watched list" });
+    }
+
+    // Remove the movie from the watched list and save the user
+    user.watchedMovies.splice(index, 1);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Movie removed from watched list successfully",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Route for deleting a watch later movie
+router.delete("/watchLater", async (req, res) => {
+  try {
+    const { email, movieId } = req.body;
+
+    // Find the user by email
+    let user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the index of the movie in the watch later list
+    const index = user.watchLaterMovies.indexOf(movieId);
+    if (index === -1) {
+      return res
+        .status(404)
+        .json({ error: "Movie not found in the watch later list" });
+    }
+
+    // Remove the movie from the watch later list and save the user
+    user.watchLaterMovies.splice(index, 1);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Movie removed from watch later list successfully",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 export default router;
