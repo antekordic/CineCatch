@@ -114,7 +114,7 @@ export default router;
 //       method: 'GET',
 //       headers: {
 //         accept: 'application/json',
-//         Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNzkyNDdmZGI3NGQwZjA3ZWJkMDY5NjgxMDE4N2Y2OSIsInN1YiI6IjY1Y2E4YzY1YTIyZDNlMDE3YjRmYmJjYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Go81zEmCmVngHKLDR-qAGW2SBzDbAYBE54Nwoqa2oWg'
+//         Authorization: Authorization: process.env.TMDB_API_KEY!,
 //       }
 //     };
 
