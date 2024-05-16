@@ -46,28 +46,6 @@ router.get("/popular-movies/next", async (req, res) => {
   movieIndex++;
 });
 
-// Get movie by ID
-router.get("/:movieId", async (req, res) => {
-  try {
-    const movieId = req.params.movieId;
-    const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US&append_to_response=videos`;
-    const options = {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        Authorization: process.env.TMDB_API_KEY!,
-      },
-    };
-
-    const response = await fetch(url, options);
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 // Define a route for movie search
 router.get("/search/:searchTerm", async (req, res) => {
   try {
@@ -103,7 +81,72 @@ router.get("/search/:searchTerm", async (req, res) => {
   }
 });
 
+// Get movies by IDs
+router.get("/", async (req, res) => {
+  try {
+    // Check if ids parameter exists in the query
+    if (!req.query.ids || typeof req.query.ids !== "string") {
+      return res
+        .status(400)
+        .json({ error: "IDs parameter is missing or not a string" });
+    }
+
+    // Extract movie IDs from request parameters
+    const movieIds = (req.query.ids as string).split(",");
+
+    // Array to store movie data
+    const moviesData = [];
+
+    // Iterate over each movie ID
+    for (const movieId of movieIds) {
+      const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US&append_to_response=videos`;
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          Authorization: process.env.TMDB_API_KEY!,
+        },
+      };
+
+      // Fetch movie data for the current ID
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      // Add movie data to the array
+      moviesData.push(data);
+    }
+
+    // Send back combined JSON response
+    res.json(moviesData);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 export default router;
+
+// // Get movie by ID
+// router.get("/:movieId", async (req, res) => {
+//   try {
+//     const movieId = req.params.movieId;
+//     const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US&append_to_response=videos`;
+//     const options = {
+//       method: "GET",
+//       headers: {
+//         accept: "application/json",
+//         Authorization: process.env.TMDB_API_KEY!,
+//       },
+//     };
+
+//     const response = await fetch(url, options);
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
 
 // router.get('/top-rated-movies/next', async (req, res) => {
 //   // If there are no movies left in the current page, fetch the next page
