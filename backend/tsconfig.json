@@ -10,6 +10,7 @@
     },
     "include": [
         "src/**/*",
-        "global.d.ts"
+        "global.d.ts",      //temporär geändert für global variable bug
+        "types/**/*"        //temporär geändert für global variable bug
       ],
 }
