@@ -2,7 +2,17 @@ import { Router } from "express";
 import { sample_movies } from "../data";
 // import asynceHandler from 'express-async-handler';
 // import { isMethodDeclaration } from "typescript";
-import fetch from "node-fetch";
+/*
+import fetch from "node-fetch";       //änderung von Thorben, fetch movie details für watched -> 17.05.24
+import fs from 'fs';                  //änderung von Thorben, fetch movie details für watched -> 17.05.24
+import path from 'path';              //änderung von Thorben, fetch movie details für watched -> 17.05.24
+import axios from 'axios';            //änderung von Thorben, fetch movie details für watched -> 17.05.24
+import dotenv from 'dotenv';          //änderung von Thorben, fetch movie details für watched -> 17.05.24
+
+dotenv.config();                      //änderung von Thorben, fetch movie details für watched -> 17.05.24
+*/
+
+
 
 const router = Router();
 
@@ -123,7 +133,56 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+/*
+//änderung von Thorben -> 17.05.24
+//mehrere asynchrone Anfragen an die TMDB API -> Promise.all um Anfragen paralel zu verarbeiten
 
+// Route to fetch movie details from TMDB based on watched movies list
+
+router.get('/fetchMovieDetails/:email', async (req, res) => {
+  try {
+      const { email } = req.params;
+      const filePath = path.join(__dirname, `../data/${email}-watched.json`);
+
+      // Read the watched movies file
+      const watchedMovies: string[] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+      // Fetch movie details from TMDB
+      const movieDetails = await Promise.all(
+          watchedMovies.map(async (movieId: string) => {
+              const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US&append_to_response=videos`;
+              const options = {
+                  method: "GET",
+                  headers: {
+                      accept: "application/json",
+                      Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+                  }
+              };
+              const response = await axios.get(url, options);
+              return {
+                  title: response.data.title,
+                  genre: response.data.genres.map((genre: { name: string }) => genre.name).join(', '),
+                  runtime: response.data.runtime,
+                  releaseDate: response.data.release_date
+              };
+          })
+      );
+
+      res.json({
+          success: true,
+          email: email,
+          movies: movieDetails
+      });
+  } catch (error: unknown) {
+      console.error('Error fetching movie details:', error);
+      if (error instanceof Error) {
+          res.status(500).json({ success: false, message: error.message });
+      } else {
+          res.status(500).json({ success: false, message: 'An unknown error occurred' });
+      }
+  }
+});
+*/
 export default router;
 
 // // Get movie by ID
