@@ -2,7 +2,6 @@ import { Router } from "express";
 import { sample_movies } from "../data";
 // import asynceHandler from 'express-async-handler';
 // import { isMethodDeclaration } from "typescript";
-/*
 import fetch from "node-fetch";       //änderung von Thorben, fetch movie details für watched -> 17.05.24
 import fs from 'fs';                  //änderung von Thorben, fetch movie details für watched -> 17.05.24
 import path from 'path';              //änderung von Thorben, fetch movie details für watched -> 17.05.24
@@ -10,8 +9,6 @@ import axios from 'axios';            //änderung von Thorben, fetch movie detai
 import dotenv from 'dotenv';          //änderung von Thorben, fetch movie details für watched -> 17.05.24
 
 dotenv.config();                      //änderung von Thorben, fetch movie details für watched -> 17.05.24
-*/
-
 
 
 const router = Router();
@@ -133,46 +130,58 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-/*
+
 //änderung von Thorben -> 17.05.24
 //mehrere asynchrone Anfragen an die TMDB API -> Promise.all um Anfragen paralel zu verarbeiten
 
 // Route to fetch movie details from TMDB based on watched movies list
 
+/*
 router.get('/fetchMovieDetails/:email', async (req, res) => {
   try {
       const { email } = req.params;
-      const filePath = path.join(__dirname, `../data/${email}-watched.json`);
+      const movieId = '123'; // Beispiel-Movie-ID
+      const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`;
 
-      // Read the watched movies file
-      const watchedMovies: string[] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const options = {
+          method: 'GET',
+          headers: {
+              accept: "application/json",
+              Authorization: process.env.TMDB_API_KEY!
+          }
+      };
 
-      // Fetch movie details from TMDB
-      const movieDetails = await Promise.all(
-          watchedMovies.map(async (movieId: string) => {
-              const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US&append_to_response=videos`;
-              const options = {
-                  method: "GET",
-                  headers: {
-                      accept: "application/json",
-                      Authorization: `Bearer ${process.env.TMDB_API_KEY}`
-                  }
-              };
-              const response = await axios.get(url, options);
-              return {
-                  title: response.data.title,
-                  genre: response.data.genres.map((genre: { name: string }) => genre.name).join(', '),
-                  runtime: response.data.runtime,
-                  releaseDate: response.data.release_date
-              };
-          })
-      );
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      if (!response.ok) {
+          throw new Error(data.status_message || 'Failed to fetch data from TMDB');
+      }
 
       res.json({
           success: true,
-          email: email,
-          movies: movieDetails
+          data: data
       });
+  } catch (error: unknown) {
+    console.error('Error fetching movie details:', error);
+    if (error instanceof Error) {
+        res.status(500).json({ success: false, message: error.message });
+    } else {
+        res.status(500).json({ success: false, message: 'An unknown error occurred' });
+    }
+}
+});
+*/
+
+// Router für "watched" Filme
+router.get('/fetchWatchedMovies/:email', async (req, res) => {
+  const { email } = req.params;
+  const filePath = path.join(__dirname, `../data/${email}-watched.json`);
+
+  try {
+      const watchedMovies: string[] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const movieDetails = await fetchMovieDetails(watchedMovies);
+      res.json({ success: true, email, movies: movieDetails });
   } catch (error: unknown) {
       console.error('Error fetching movie details:', error);
       if (error instanceof Error) {
@@ -182,7 +191,64 @@ router.get('/fetchMovieDetails/:email', async (req, res) => {
       }
   }
 });
-*/
+
+// Router für "watchLater" Filme
+router.get('/fetchWatchLaterMovies/:email', async (req, res) => {
+  const { email } = req.params;
+  const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
+
+  try {
+      const watchLaterMovies: string[] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const movieDetails = await fetchMovieDetails(watchLaterMovies);
+      res.json({ success: true, email, movies: movieDetails });
+  } catch (error: unknown) {
+      console.error('Error fetching movie details:', error);
+      if (error instanceof Error) {
+          res.status(500).json({ success: false, message: error.message });
+      } else {
+          res.status(500).json({ success: false, message: 'An unknown error occurred' });
+      }
+  }
+});
+
+//testfetch
+
+router.get('/fetchMovieDetails/:email', async (req, res) => {
+  try {
+      const { email } = req.params;
+      const movieId = '123'; // Beispiel-Movie-ID
+      const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`;
+
+      const options = {
+          method: 'GET',
+          headers: {
+              accept: "application/json",
+              Authorization: process.env.TMDB_API_KEY!
+          }
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      if (!response.ok) {
+          throw new Error(data.status_message || 'Failed to fetch data from TMDB');
+      }
+
+      res.json({
+          success: true,
+          data: data
+      });
+  } catch (error: unknown) {
+    console.error('Error fetching movie details:', error);
+    if (error instanceof Error) {
+        res.status(500).json({ success: false, message: error.message });
+    } else {
+        res.status(500).json({ success: false, message: 'An unknown error occurred' });
+    }
+}
+});
+
+
 export default router;
 
 // // Get movie by ID
@@ -242,3 +308,59 @@ export default router;
 //   res.json(nextMovie);
 //   movieIndex++;
 // });
+// Hilfsfunktion zum Abrufen von Filmdetails
+
+/* Test -> falls fehler, dies funktioniert ohne genre
+// Hilfsfunktion zum Abrufen von Filmdetails -> einmal erstellt für mehrere Router
+async function fetchMovieDetails(movieIds: string[]) {
+  return Promise.all(movieIds.map(async (movieId) => {
+      const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`;
+      const options = {
+          method: 'GET',
+          headers: {
+              accept: "application/json",
+              Authorization: process.env.TMDB_API_KEY!
+          }
+      };
+      const response = await fetch(url, options);
+      const data = await response.json();
+      if (!response.ok) {
+          throw new Error(data.status_message || 'Failed to fetch data from TMDB');
+      }
+      return {                          //Aus TMDB abgerufene Informationen
+          title: data.title,
+          releaseDate: data.release_date,
+          originalLanguage: data.original_language,
+          genres: data.genres.map(genre => ({ id: genre.id, name: genre.name }))  //geändert
+      };
+  }));
+}
+*/
+interface Genre {
+  id: number;
+  name: string;
+}
+
+async function fetchMovieDetails(movieIds: string[]) {
+  return Promise.all(movieIds.map(async (movieId) => {
+      const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}&language=en-US`;
+      const options = {
+          method: 'GET',
+          headers: {
+              accept: "application/json",
+              Authorization: process.env.TMDB_API_KEY!
+          }
+      };
+      const response = await fetch(url, options);
+      const data = await response.json();
+      if (!response.ok) {
+          throw new Error(data.status_message || 'Failed to fetch data from TMDB');
+      }
+      return {
+          title: data.title,
+          releaseDate: data.release_date,
+          originalLanguage: data.original_language,
+          genres: data.genres.map((genre: Genre) => ({ id: genre.id, name: genre.name }))
+      };
+  }));
+}
