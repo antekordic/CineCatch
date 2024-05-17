@@ -255,57 +255,12 @@ router.delete("/watchLater", async (req, res) => {
   }
 });
 
-/* Nutzung einer Globalen variable zum zwischenspeichern der Daten
-// Typisierung für globale Variablen hinzufügen
-declare global {
-  namespace NodeJS {
-    interface Global {
-      watchedMoviesData: any[];
-      watchLaterMovieIds: any[];
-    }
-  }
-}
-
-
-
-// Route, um alle gesehenen Film-IDs und Bewertungen zu erhalten
-router.get("/watchedMovies", asyncHandler(async (req, res) => {
-  try {
-    // Alle Benutzerdaten abrufen
-    const users = await UserModel.find({});
-    const watchedMoviesData = users.map(user => user.watchedMovies.map(movie => ({ movieId: movie.movieId, rating: movie.rating }))).flat();
-    // Ergebnisse in einer globalen Variable speichern -> später auf Caching mit Redis wechseln
-    global.watchedMoviesData = watchedMoviesData;
-    res.json({ watchedMoviesData });
-  } catch (error) {
-    console.error("Fehler:", error);
-    res.status(HTTP_BAD_REQUEST).json({ error: "Interner Serverfehler" });
-  }
-}));
-
-// Route, um alle später zu sehenden Film-IDs zu erhalten
-router.get("/watchLaterMovies", asyncHandler(async (req, res) => {
-  try {
-    const users = await UserModel.find({});
-    const watchLaterMovieIds = users.map(user => user.watchLaterMovies).flat();
-    // Ergebnisse in einer globalen Variable speichern
-    global.watchLaterMovieIds = watchLaterMovieIds;
-    res.json({ watchLaterMovieIds });
-  } catch (error) {
-    console.error("Fehler:", error);
-    res.status(HTTP_BAD_REQUEST).json({ error: "Interner Serverfehler" });
-  }
-}));
-*/
-
-
 // /* Alternative zu Redis, zwischenspeichern in jason
 // Hilfsfunktion zum Speichern von Daten in einer Datei
 const saveDataToFile = (filename: string, data: any) => {
   const filePath = path.join(__dirname, '..', 'data', filename);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 };
-
 // Hilfsfunktion zum Laden von Daten aus einer Datei
 const loadDataFromFile = (filename: string) => {
   const filePath = path.join(__dirname, '..', 'data', filename);
@@ -316,39 +271,55 @@ const loadDataFromFile = (filename: string) => {
   return null;
 };
 
-// Route, um alle gesehenen Film-IDs und Bewertungen zu erhalten und in einer JSON-Datei zu speichern
-router.get("/watchedMovies", asyncHandler(async (req, res) => {
+// Route to save watched movie IDs to a JSON file
+router.post("/savewatchedMovies", async (req, res) => {
   try {
-    const users = await UserModel.find({});
-    const watchedMoviesData = users.map(user => user.watchedMovies.map(movie => ({ movieId: movie.movieId, rating: movie.rating }))).flat();
-    
-    // Speichern der Daten in einer JSON-Datei
-    saveDataToFile('watchedMoviesData.json', watchedMoviesData);
-
-    res.json({ watchedMoviesData });
+    const { email } = req.body;
+    // Find the user by email
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Extract watched movie IDs
+    const watchedMovieIds = user.watchedMovies.map(movie => movie.movieId);
+    // Save to JSON file
+    const filePath = path.join(__dirname, `../data/${email}-watched.json`);
+    fs.writeFileSync(filePath, JSON.stringify(watchedMovieIds, null, 2), 'utf8');
+    res.json({
+      success: true,
+      message: "Watched movie IDs saved to JSON file",
+      filePath: filePath
+    });
   } catch (error) {
-    console.error("Fehler:", error);
-    res.status(HTTP_BAD_REQUEST).json({ error: "Interner Serverfehler" });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-}));
+});
 
-// Route, um alle später zu sehenden Film-IDs zu erhalten und in einer JSON-Datei zu speichern
-router.get("/watchLaterMovies", asyncHandler(async (req, res) => {
+// Route to save watch later movie IDs to a JSON file
+router.post("/savewatchLaterMovies", async (req, res) => {
   try {
-    const users = await UserModel.find({});
-    const watchLaterMovieIds = users.map(user => user.watchLaterMovies).flat();
-    
-    // Speichern der Daten in einer JSON-Datei
-    saveDataToFile('watchLaterMovieIds.json', watchLaterMovieIds);
-
-    res.json({ watchLaterMovieIds });
+    const { email } = req.body;
+    // Find the user by email
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Extract watch later movie IDs
+    const watchLaterMovieIds = user.watchLaterMovies;
+    // Save to JSON file
+    const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
+    fs.writeFileSync(filePath, JSON.stringify(watchLaterMovieIds, null, 2), 'utf8');
+    res.json({
+      success: true,
+      message: "Watch later movie IDs saved to JSON file",
+      filePath: filePath
+    });
   } catch (error) {
-    console.error("Fehler:", error);
-    res.status(HTTP_BAD_REQUEST).json({ error: "Interner Serverfehler" });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-}));
-//*/
-
+});
 
 
 export default router;
