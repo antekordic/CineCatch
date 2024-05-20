@@ -129,7 +129,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Router für "watched" Filme
+// requires a current json -> execute the user route savewatchedMovies beforehand
+// Sends “watched” movies from the user json to tmdb and outputs the response. Title, release date, original language, and genre as map
 router.get('/fetchWatchedMovies/:email', async (req, res) => {
   const { email } = req.params;
   const filePath = path.join(__dirname, `../data/${email}-watched.json`);
@@ -148,7 +149,8 @@ router.get('/fetchWatchedMovies/:email', async (req, res) => {
   }
 });
 
-// Router für "watchLater" Filme
+// requires a current json -> execute the user route savewatchLater beforehand
+// Sends "watchLaterMovies" movies from the user json to tmdb and outputs the response. Title, release date, original language, and genre as map
 router.get('/fetchWatchLaterMovies/:email', async (req, res) => {
   const { email } = req.params;
   const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
@@ -169,12 +171,13 @@ router.get('/fetchWatchLaterMovies/:email', async (req, res) => {
 
 export default router;
 
-
+//sets the structure for genre
 interface Genre {
   id: number;
   name: string;
 }
 
+// helper function for fetchWatchedMovies and fetchwatchLaterMovies -> performs the actual tmdb request and feedback. Can be used for more fetching usecases
 async function fetchMovieDetails(movieIds: string[]) {
   return Promise.all(movieIds.map(async (movieId) => {
       const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}&language=en-US`;
@@ -191,6 +194,7 @@ async function fetchMovieDetails(movieIds: string[]) {
           throw new Error(data.status_message || 'Failed to fetch data from TMDB');
       }
       return {
+          //if required, the queried id can be returned again for better allocation
           title: data.title,
           releaseDate: data.release_date,
           originalLanguage: data.original_language,

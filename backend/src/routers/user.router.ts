@@ -5,10 +5,8 @@ import asyncHandler from "express-async-handler";
 import { User, UserModel } from "../models/user.model";
 import { HTTP_BAD_REQUEST } from "../constants/http_status";
 import bcrypt from "bcryptjs";
-// /* Für Redis alternative -> zwischenspeichern in Jason
 import fs from 'fs';
 import path from 'path';
-// */
 
 const router = Router();
 
@@ -255,13 +253,16 @@ router.delete("/watchLater", async (req, res) => {
   }
 });
 
-// /* Alternative zu Redis, zwischenspeichern in jason
-// Hilfsfunktion zum Speichern von Daten in einer Datei
+
+// Alternative to Redis, caching in jason:
+
+// Help function for saving data in a file
 const saveDataToFile = (filename: string, data: any) => {
   const filePath = path.join(__dirname, '..', 'data', filename);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 };
-// Hilfsfunktion zum Laden von Daten aus einer Datei
+
+// Help function for loading data from a file
 const loadDataFromFile = (filename: string) => {
   const filePath = path.join(__dirname, '..', 'data', filename);
   if (fs.existsSync(filePath)) {
