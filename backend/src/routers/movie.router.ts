@@ -57,17 +57,20 @@ router.get("/popular-movies/next", async (req, res) => {
 });
 
 // Define a route for movie search
-router.get("/search/:searchTerm", async (req, res) => {
+router.get("/movies/search", async (req, res) => {
   try {
-    const query = req.query.query?.toString(); // Ensure query is accessed as a string
+    const query = req.query.q; // Ensure query is accessed as a string
     const page = req.query.page || 1; // Get the page number, default to 1 if not provided
     if (!query) {
       return res.status(400).json({ error: "Query parameter is missing" });
     }
 
+    // Ensure query is accessed as a string if it exists
+    const queryString = query ? query.toString() : '';
+
     // Build the URL for the search API
     const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
-      query
+      queryString
     )}&language=en-US&page=${page}`;
 
     // Set up options for the fetch request
