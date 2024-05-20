@@ -5,6 +5,10 @@ import asyncHandler from "express-async-handler";
 import { User, UserModel } from "../models/user.model";
 import { HTTP_BAD_REQUEST } from "../constants/http_status";
 import bcrypt from "bcryptjs";
+// /* Für Redis alternative -> zwischenspeichern in Jason
+import fs from 'fs';
+import path from 'path';
+// */
 
 const router = Router();
 
@@ -250,5 +254,72 @@ router.delete("/watchLater", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// /* Alternative zu Redis, zwischenspeichern in jason
+// Hilfsfunktion zum Speichern von Daten in einer Datei
+const saveDataToFile = (filename: string, data: any) => {
+  const filePath = path.join(__dirname, '..', 'data', filename);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+};
+// Hilfsfunktion zum Laden von Daten aus einer Datei
+const loadDataFromFile = (filename: string) => {
+  const filePath = path.join(__dirname, '..', 'data', filename);
+  if (fs.existsSync(filePath)) {
+    const data = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(data);
+  }
+  return null;
+};
+
+// Route to save watched movie IDs to a JSON file
+router.post("/savewatchedMovies", async (req, res) => {
+  try {
+    const { email } = req.body;
+    // Find the user by email
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Extract watched movie IDs
+    const watchedMovieIds = user.watchedMovies.map(movie => movie.movieId);
+    // Save to JSON file
+    const filePath = path.join(__dirname, `../data/${email}-watched.json`);
+    fs.writeFileSync(filePath, JSON.stringify(watchedMovieIds, null, 2), 'utf8');
+    res.json({
+      success: true,
+      message: "Watched movie IDs saved to JSON file",
+      filePath: filePath
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Route to save watch later movie IDs to a JSON file
+router.post("/savewatchLaterMovies", async (req, res) => {
+  try {
+    const { email } = req.body;
+    // Find the user by email
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Extract watch later movie IDs
+    const watchLaterMovieIds = user.watchLaterMovies;
+    // Save to JSON file
+    const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
+    fs.writeFileSync(filePath, JSON.stringify(watchLaterMovieIds, null, 2), 'utf8');
+    res.json({
+      success: true,
+      message: "Watch later movie IDs saved to JSON file",
+      filePath: filePath
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 export default router;
