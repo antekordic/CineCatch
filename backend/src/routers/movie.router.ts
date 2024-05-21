@@ -12,8 +12,6 @@ import dotenv from 'dotenv';          //änderung von Thorben, fetch movie detai
 dotenv.config();                      //änderung von Thorben, fetch movie details für watched -> 17.05.24
 */
 
-
-
 const router = Router();
 
 let currentPage = 1;
@@ -57,7 +55,7 @@ router.get("/popular-movies/next", async (req, res) => {
 });
 
 // Define a route for movie search
-router.get("/search/:searchTerm", async (req, res) => {
+router.get("/search", async (req, res) => {
   try {
     const query = req.query.query?.toString(); // Ensure query is accessed as a string
     const page = req.query.page || 1; // Get the page number, default to 1 if not provided
