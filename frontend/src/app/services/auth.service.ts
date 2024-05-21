@@ -1,21 +1,49 @@
-import { Injectable } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import {inject, Injectable} from '@angular/core';
+import {catchError, map, ReplaySubject, tap, throwError} from 'rxjs';
+import {LocalStorageService} from "./local-storage.service";
+import {HttpClient} from "@angular/common/http";
+import {USER_LOGIN_URL} from "../shared/constants/urls";
+import {User} from "../shared/models/User";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly jwtStorageKey = 'jwt';
 
-  private readonly loggedIn$$ = new ReplaySubject<boolean>(1);
-  public readonly loggedIn$ = this.loggedIn$$.asObservable();
+  private readonly http = inject(HttpClient);
+  private readonly localStorage = inject(LocalStorageService);
+
+  private readonly jwt$$ = new ReplaySubject<string | null>(1);
+  public readonly loggedIn$ = this.jwt$$.pipe(
+    map(jwt => !!jwt),
+  );
 
   constructor() { }
 
+  public checkAuthentication(): void {
+    // TODO: check against backend
+
+    this.jwt$$.next(this.localStorage.getItem<string>(this.jwtStorageKey));
+  }
+
   public login(email: string, password: string) {
-    this.loggedIn$$.next(true);
+    return this.http.post<User>(USER_LOGIN_URL, {
+      email,
+      password
+    }).pipe(
+      catchError(error => throwError((() => new Error(error.error)))),
+      tap(({token}) => this.persistToken(token)),
+    );
   }
 
   public logout() {
-    this.loggedIn$$.next(false);
+    this.localStorage.removeItem(this.jwtStorageKey);
+    this.jwt$$.next(null);
+  }
+
+  private persistToken(jwt: string): void {
+    this.localStorage.setItem(this.jwtStorageKey, jwt);
+    this.jwt$$.next(jwt);
   }
 }

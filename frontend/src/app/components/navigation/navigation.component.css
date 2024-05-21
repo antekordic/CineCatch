@@ -1,0 +1,22 @@
+.navigation {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation__item {}
+
+.navigation-link {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+
+.navigation-link--logout {
+  color: var(--color-danger);
+}
+
+.navigation-link:hover {
+  background: var(--color-grey-light);
+  cursor: pointer;
+}

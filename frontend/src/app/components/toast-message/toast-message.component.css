@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  position: relative;
+  margin: var(--spacing-default-half);
+  color: var(--color-light);
+  padding: var(--spacing-default-half);
+}
+
+:host-context([toast-type="message"]) {
+  background-color: var(--color-primary);
+}
+
+:host-context([toast-type="error"]) {
+  background-color: var(--color-danger);
+}
+
+:host-context([toast-type="success"]) {
+  background-color: var(--color-success);
+}
+
+:host:hover {
+  cursor: pointer;
+}

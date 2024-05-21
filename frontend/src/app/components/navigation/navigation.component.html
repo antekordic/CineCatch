@@ -1,6 +1,12 @@
-<ul>
-  <li><a routerLink="/">Start</a></li>
-  <li><a routerLink="/movies">Movies</a></li>
-  <li><a routerLink="/movies" [queryParams]="{watched: false}">Unwatched/Watch Later</a></li>
-  <li><a routerLink="/movies" [queryParams]="{watched: true}">Watched</a></li>
+<ul class="navigation">
+  @if (loggedIn$ | async; as loggedIn) {
+    <li class="navigation__item"><a class="navigation-link" routerLink="/">Start</a></li>
+    <li class="navigation__item"><a class="navigation-link" routerLink="/movies">Movies</a></li>
+    <li class="navigation__item"><a class="navigation-link" routerLink="/movies" [queryParams]="{watched: false}">Unwatched/Watch Later</a></li>
+    <li class="navigation__item"><a class="navigation-link" routerLink="/movies" [queryParams]="{watched: true}">Watched</a></li>
+    <li class="navigation__item"><a class="navigation-link navigation-link--logout" (click)="logout()" href="javascript:;">Logout</a></li>
+  } @else {
+    <li class="navigation__item"><a class="navigation-link" routerLink="/login">Login</a></li>
+    <li class="navigation__item"><a class="navigation-link" routerLink="/signup">Sign Up</a></li>
+  }
 </ul>

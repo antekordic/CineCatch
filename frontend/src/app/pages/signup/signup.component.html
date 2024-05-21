@@ -1,7 +1,7 @@
-<h1 class="heading">Login</h1>
-<p class="description">Login-in to your account.</p>
+<h1 class="heading">Sign Up</h1>
+<p class="description">Create an account!</p>
 
-<form [formGroup]="loginForm" (ngSubmit)="login()">
+<form [formGroup]="signUpForm" (ngSubmit)="signUp()">
   <div class="mv-input">
     <label class="mv-input__label" for="email">Email</label>
     <input class="mv-input__input" required type="email" formControlName="email" id="email" name="email" placeholder="Email">
@@ -12,12 +12,17 @@
     <input class="mv-input__input" required type="password" formControlName="password" id="password" name="password" placeholder="Password">
   </div>
 
+  <div class="mv-input">
+    <label class="mv-input__label" for="repeatPassword">Repeat Password</label>
+    <input class="mv-input__input" required type="password" formControlName="passwordRepeat" id="repeatPassword" name="repeatPassword" placeholder="Repeat Password">
+  </div>
+
   <div class="buttons">
-    <button class="mv-button mv-button--submit" type="submit" [disabled]="loginForm.invalid">Login</button>
+    <button class="mv-button mv-button--submit" type="submit" [disabled]="signUpForm.invalid">Submit</button>
     <button class="mv-button mv-button--cancel" type="reset">Cancel</button>
   </div>
 
   <div class="note">
-    <span>Need an account? <a routerLink="/signup">Sign up</a></span>
+    <span>Already have an account? <a routerLink="/login">Sign in</a></span>
   </div>
 </form>

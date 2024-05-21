@@ -1,22 +1,21 @@
 :host {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.header {
-  height: 120px;
-  background: darkslateblue;
-}
-
 .content {
   display: flex;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .aside {
   width: 250px;
 }
 
-.main {
-  flex: 1;
+.toast {
+  position: relative;
+  height: 0;
 }
 
