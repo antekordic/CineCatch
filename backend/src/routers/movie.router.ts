@@ -73,7 +73,7 @@ router.get(
 );
 
 // Define a route for movie search
-router.get("/search/:searchTerm", async (req, res) => {
+router.get("/search", async (req, res) => {
   try {
     const query = req.query.query?.toString(); // Ensure query is accessed as a string
     const page = req.query.page || 1; // Get the page number, default to 1 if not provided
