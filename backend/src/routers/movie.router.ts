@@ -1,17 +1,12 @@
 import { Router } from "express";
 import { sample_movies } from "../data";
-// import asynceHandler from 'express-async-handler';
-// import { isMethodDeclaration } from "typescript";
-/*
-import fetch from "node-fetch";       //änderung von Thorben, fetch movie details für watched -> 17.05.24
-import fs from 'fs';                  //änderung von Thorben, fetch movie details für watched -> 17.05.24
-import path from 'path';              //änderung von Thorben, fetch movie details für watched -> 17.05.24
-import axios from 'axios';            //änderung von Thorben, fetch movie details für watched -> 17.05.24
-import dotenv from 'dotenv';          //änderung von Thorben, fetch movie details für watched -> 17.05.24
+import fetch from "node-fetch";       
+import fs from 'fs';                 
+import path from 'path';              
+import axios from 'axios';           
+import dotenv from 'dotenv';          
 
-dotenv.config();                      //änderung von Thorben, fetch movie details für watched -> 17.05.24
-*/
-
+dotenv.config();                    
 
 
 const router = Router();
@@ -133,46 +128,17 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-/*
-//änderung von Thorben -> 17.05.24
-//mehrere asynchrone Anfragen an die TMDB API -> Promise.all um Anfragen paralel zu verarbeiten
 
-// Route to fetch movie details from TMDB based on watched movies list
+// requires a current json -> execute the user route savewatchedMovies beforehand
+// Sends “watched” movies from the user json to tmdb and outputs the response. Title, release date, original language, and genre as map
+router.get('/fetchWatchedMovies/:email', async (req, res) => {
+  const { email } = req.params;
+  const filePath = path.join(__dirname, `../data/${email}-watched.json`);
 
-router.get('/fetchMovieDetails/:email', async (req, res) => {
   try {
-      const { email } = req.params;
-      const filePath = path.join(__dirname, `../data/${email}-watched.json`);
-
-      // Read the watched movies file
       const watchedMovies: string[] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
-      // Fetch movie details from TMDB
-      const movieDetails = await Promise.all(
-          watchedMovies.map(async (movieId: string) => {
-              const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US&append_to_response=videos`;
-              const options = {
-                  method: "GET",
-                  headers: {
-                      accept: "application/json",
-                      Authorization: `Bearer ${process.env.TMDB_API_KEY}`
-                  }
-              };
-              const response = await axios.get(url, options);
-              return {
-                  title: response.data.title,
-                  genre: response.data.genres.map((genre: { name: string }) => genre.name).join(', '),
-                  runtime: response.data.runtime,
-                  releaseDate: response.data.release_date
-              };
-          })
-      );
-
-      res.json({
-          success: true,
-          email: email,
-          movies: movieDetails
-      });
+      const movieDetails = await fetchMovieDetails(watchedMovies);
+      res.json({ success: true, email, movies: movieDetails });
   } catch (error: unknown) {
       console.error('Error fetching movie details:', error);
       if (error instanceof Error) {
@@ -182,63 +148,57 @@ router.get('/fetchMovieDetails/:email', async (req, res) => {
       }
   }
 });
-*/
+
+// requires a current json -> execute the user route savewatchLater beforehand
+// Sends "watchLaterMovies" movies from the user json to tmdb and outputs the response. Title, release date, original language, and genre as map
+router.get('/fetchWatchLaterMovies/:email', async (req, res) => {
+  const { email } = req.params;
+  const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
+
+  try {
+      const watchLaterMovies: string[] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const movieDetails = await fetchMovieDetails(watchLaterMovies);
+      res.json({ success: true, email, movies: movieDetails });
+  } catch (error: unknown) {
+      console.error('Error fetching movie details:', error);
+      if (error instanceof Error) {
+          res.status(500).json({ success: false, message: error.message });
+      } else {
+          res.status(500).json({ success: false, message: 'An unknown error occurred' });
+      }
+  }
+});
+
 export default router;
 
-// // Get movie by ID
-// router.get("/:movieId", async (req, res) => {
-//   try {
-//     const movieId = req.params.movieId;
-//     const url = `https://api.themoviedb.org/3/movie/${movieId}?language=en-US&append_to_response=videos`;
-//     const options = {
-//       method: "GET",
-//       headers: {
-//         accept: "application/json",
-//         Authorization: process.env.TMDB_API_KEY!,
-//       },
-//     };
+//sets the structure for genre
+interface Genre {
+  id: number;
+  name: string;
+}
 
-//     const response = await fetch(url, options);
-//     const data = await response.json();
-//     res.json(data);
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
-
-// router.get('/top-rated-movies/next', async (req, res) => {
-//   // If there are no movies left in the current page, fetch the next page
-//   if (movieIndex >= movies.length) {
-
-//     const url = `https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=${currentPage}`;
-//     const options = {
-//       method: 'GET',
-//       headers: {
-//         accept: 'application/json',
-//         Authorization: Authorization: process.env.TMDB_API_KEY!,
-//       }
-//     };
-
-//     try {
-//       const response = await fetch(url, options);
-//       const data = await response.json();
-
-//       if (data.results && data.results.length > 0) {
-//         movies = data.results;
-//         movieIndex = 0;
-//         currentPage++;
-//       } else {
-//         return res.status(404).json({ error: 'No movies found' });
-//       }
-//     } catch (error) {
-//       console.error('Error fetching top-rated movies:', error);
-//       return res.status(500).json({ error: 'Internal Server Error' });
-//     }
-//   }
-
-//   // Send the next movie to the frontend
-//   const nextMovie = movies[movieIndex];
-//   res.json(nextMovie);
-//   movieIndex++;
-// });
+// helper function for fetchWatchedMovies and fetchwatchLaterMovies -> performs the actual tmdb request and feedback. Can be used for more fetching usecases
+async function fetchMovieDetails(movieIds: string[]) {
+  return Promise.all(movieIds.map(async (movieId) => {
+      const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}&language=en-US`;
+      const options = {
+          method: 'GET',
+          headers: {
+              accept: "application/json",
+              Authorization: process.env.TMDB_API_KEY!
+          }
+      };
+      const response = await fetch(url, options);
+      const data = await response.json();
+      if (!response.ok) {
+          throw new Error(data.status_message || 'Failed to fetch data from TMDB');
+      }
+      return {
+          //if required, the queried id can be returned again for better allocation
+          title: data.title,
+          releaseDate: data.release_date,
+          originalLanguage: data.original_language,
+          genres: data.genres.map((genre: Genre) => ({ id: genre.id, name: genre.name }))
+      };
+  }));
+}
