@@ -1,14 +1,20 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
 export interface User {
-  id: string;
   email: string;
   password: string;
   watchedMovies: Array<{ movieId: string; rating?: number }>;
   watchLaterMovies: string[];
 }
 
-export const UserSchema = new Schema<User>(
+export interface UserDocument extends Document {
+  email: string;
+  password: string;
+  watchedMovies: Array<{ movieId: string; rating?: number }>;
+  watchLaterMovies: string[];
+}
+
+const userSchema = new Schema<UserDocument>(
   {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -26,4 +32,4 @@ export const UserSchema = new Schema<User>(
   }
 );
 
-export const UserModel = model<User>("user", UserSchema);
+export const UserModel = model<UserDocument>("User", userSchema);

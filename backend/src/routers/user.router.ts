@@ -6,6 +6,7 @@ import { HTTP_BAD_REQUEST } from "../constants/http_status";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
+import { LoginDTO, RegisterDTO, TokenResponseDTO } from "../dtos/user.dto";
 
 const router = Router();
 
@@ -26,14 +27,24 @@ const router = Router();
 router.post(
   "/login",
   asyncHandler(async (req: Request & { session: any }, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password }: LoginDTO = req.body;
     const user = await UserModel.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      const token = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.JWT_SECRET!,
+        { expiresIn: "30d" }
+      );
+      const tokenResponse: TokenResponseDTO = {
+        id: user.id,
+        email: user.email,
+        token,
+      };
       req.session.userId = user.id; // Save user ID in session
-      res.send(generateTokenResponse(user));
+      res.json(tokenResponse);
     } else {
-      res.status(400).send("Username or password is invalid!");
+      res.status(400).json({ error: "Username or password is invalid!" });
     }
   })
 );
@@ -41,48 +52,39 @@ router.post(
 router.post(
   "/register",
   asyncHandler(async (req: Request & { session: any }, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password }: RegisterDTO = req.body;
     const user = await UserModel.findOne({ email });
 
     if (user) {
-      res.status(400).send("User already exists, please login!");
+      res.status(400).json({ error: "User already exists, please login!" });
       return;
     }
 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
-    const newUser: User = {
-      id: "", // MongoDB will generate this ID
+    const newUser = await UserModel.create({
       email: email.toLowerCase(),
       password: encryptedPassword,
       watchedMovies: [],
       watchLaterMovies: [],
+    });
+
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email },
+      process.env.JWT_SECRET!,
+      { expiresIn: "30d" }
+    );
+
+    const tokenResponse: TokenResponseDTO = {
+      id: newUser.id,
+      email: newUser.email,
+      token,
     };
 
-    const dbUser = await UserModel.create(newUser);
-    req.session.userId = dbUser.id; // Save user ID in session
-    res.send(generateTokenResponse(dbUser));
+    req.session.userId = newUser.id; // Save user ID in session
+    res.json(tokenResponse);
   })
 );
-
-const generateTokenResponse = (user: User) => {
-  const token = jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-    },
-    process.env.JWT_SECRET!, // Use JWT_SECRET instead of JWT_TOKEN
-    {
-      expiresIn: "30d",
-    }
-  );
-
-  return {
-    id: user.id,
-    email: user.email,
-    token: token,
-  };
-};
 
 // Define a route for adding movie IDs to the user's watched list
 router.post("/watched", async (req, res) => {

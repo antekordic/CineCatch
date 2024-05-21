@@ -2,9 +2,6 @@ import { Router, Request, Response } from "express";
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const router = Router();
 
@@ -38,7 +35,7 @@ router.get(
         method: "GET",
         headers: {
           accept: "application/json",
-          Authorization: process.env.TMDB_API_KEY!, // Corrected the Authorization header format
+          Authorization: process.env.TMDB_API_KEY!,
         },
       };
 
@@ -198,8 +195,6 @@ router.get("/fetchWatchLaterMovies/:email", async (req, res) => {
   }
 });
 
-export default router;
-
 //sets the structure for genre
 interface Genre {
   id: number;
@@ -238,3 +233,5 @@ async function fetchMovieDetails(movieIds: string[]) {
     })
   );
 }
+
+export default router;
