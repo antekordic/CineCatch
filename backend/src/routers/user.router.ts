@@ -67,7 +67,7 @@ const generateTokenReponse = (user: User) => {
       id: user.id,
       email: user.email,
     },
-    process.env.JWT_TOKEN!,
+    process.env.JWT_SECRET!,
     {
       expiresIn: "30d",
     }

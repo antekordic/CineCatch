@@ -13,8 +13,8 @@ dbConnect();
 const app = express();
 app.use(express.json());
 app.use(cors({
-    credentials:true,
-    origin:["http://localhost:4200"]
+    credentials: true,
+    origin: ["http://localhost:4200"]
 }));
 
 app.use("/api/movies", movieRouter);
@@ -22,7 +22,7 @@ app.use("/api/users", userRouter);
 
 
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4201;
 app.listen(port, () => {
     console.log("Website served on http://localhost:" + port);
 })
