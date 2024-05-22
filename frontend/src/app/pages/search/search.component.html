@@ -1,0 +1,9 @@
+<p>search works!</p>
+
+Search Query: {{ query$ | async }}
+
+<ul>
+  @for(movie of searchResult$ | async; track movie.id) {
+    <li><a [routerLink]="['/movies', movie.id]">{{ movie.title }}</a></li>
+  }
+</ul>
