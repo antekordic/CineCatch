@@ -1,16 +1,16 @@
 {
-    "compilerOptions": {
+  "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "node",
     "strict": true,
     "outDir": "./built",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "esModuleInterop": true,
-    },
-    "include": [
-        "src/**/*",
-        //"global.d.ts",      //temporär geändert für global variable bug
-        //"types/**/*"        //temporär geändert für global variable bug 
-      ],
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/**/*"
+    //"global.d.ts",      //temporär geändert für global variable bug
+    //"types/**/*"        //temporär geändert für global variable bug
+  ]
 }

@@ -1,86 +1,90 @@
-import { Router } from "express";
-import { sample_users } from "../data";
+import { Router, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import { User, UserModel } from "../models/user.model";
 import { HTTP_BAD_REQUEST } from "../constants/http_status";
 import bcrypt from "bcryptjs";
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
+import { LoginDTO, RegisterDTO, TokenResponseDTO } from "../dtos/user.dto";
 
 const router = Router();
 
-router.get(
-  "/seed",
-  asyncHandler(async (req, res) => {
-    const usersCount = await UserModel.countDocuments();
-    if (usersCount > 0) {
-      res.send("Seed is already done!");
-      return;
-    }
+// router.get(
+//   "/seed",
+//   asyncHandler(async (req, res) => {
+//     const usersCount = await UserModel.countDocuments();
+//     if (usersCount > 0) {
+//       res.send("Seed is already done!");
+//       return;
+//     }
 
-    await UserModel.create(sample_users);
-    res.send("Seed Is Done!");
-  })
-);
+//     await UserModel.create(sample_users);
+//     res.send("Seed Is Done!");
+//   })
+// );
 
 router.post(
   "/login",
-  asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+  asyncHandler(async (req: Request & { session: any }, res: Response) => {
+    const { email, password }: LoginDTO = req.body;
     const user = await UserModel.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.send(generateTokenReponse(user));
+      const token = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.JWT_SECRET!,
+        { expiresIn: "30d" }
+      );
+      const tokenResponse: TokenResponseDTO = {
+        id: user.id,
+        email: user.email,
+        token,
+      };
+      req.session.userId = user.id; // Save user ID in session
+      res.json(tokenResponse);
     } else {
-      res.status(HTTP_BAD_REQUEST).send("Username or password is invalid!");
+      res.status(400).json({ error: "Username or password is invalid!" });
     }
   })
 );
 
 router.post(
   "/register",
-  asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+  asyncHandler(async (req: Request & { session: any }, res: Response) => {
+    const { email, password }: RegisterDTO = req.body;
     const user = await UserModel.findOne({ email });
+
     if (user) {
-      res.status(HTTP_BAD_REQUEST).send("User already exist, please login!");
+      res.status(400).json({ error: "User already exists, please login!" });
       return;
     }
 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
-    const newUser: User = {
-      id: "",
+    const newUser = await UserModel.create({
       email: email.toLowerCase(),
       password: encryptedPassword,
       watchedMovies: [],
       watchLaterMovies: [],
+    });
+
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email },
+      process.env.JWT_SECRET!,
+      { expiresIn: "30d" }
+    );
+
+    const tokenResponse: TokenResponseDTO = {
+      id: newUser.id,
+      email: newUser.email,
+      token,
     };
 
-    const dbUser = await UserModel.create(newUser);
-    res.send(generateTokenReponse(dbUser));
+    req.session.userId = newUser.id; // Save user ID in session
+    res.json(tokenResponse);
   })
 );
-
-const generateTokenReponse = (user: User) => {
-  const token = jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-    },
-    process.env.JWT_TOKEN!,
-    {
-      expiresIn: "30d",
-    }
-  );
-
-  return {
-    id: user.id,
-    email: user.email,
-    token: token,
-  };
-};
 
 // Define a route for adding movie IDs to the user's watched list
 router.post("/watched", async (req, res) => {
@@ -253,20 +257,19 @@ router.delete("/watchLater", async (req, res) => {
   }
 });
 
-
 // Alternative to Redis, caching in jason:
 
 // Help function for saving data in a file
 const saveDataToFile = (filename: string, data: any) => {
-  const filePath = path.join(__dirname, '..', 'data', filename);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+  const filePath = path.join(__dirname, "..", "data", filename);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
 };
 
 // Help function for loading data from a file
 const loadDataFromFile = (filename: string) => {
-  const filePath = path.join(__dirname, '..', 'data', filename);
+  const filePath = path.join(__dirname, "..", "data", filename);
   if (fs.existsSync(filePath)) {
-    const data = fs.readFileSync(filePath, 'utf8');
+    const data = fs.readFileSync(filePath, "utf8");
     return JSON.parse(data);
   }
   return null;
@@ -282,14 +285,18 @@ router.post("/savewatchedMovies", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     // Extract watched movie IDs
-    const watchedMovieIds = user.watchedMovies.map(movie => movie.movieId);
+    const watchedMovieIds = user.watchedMovies.map((movie) => movie.movieId);
     // Save to JSON file
     const filePath = path.join(__dirname, `../data/${email}-watched.json`);
-    fs.writeFileSync(filePath, JSON.stringify(watchedMovieIds, null, 2), 'utf8');
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(watchedMovieIds, null, 2),
+      "utf8"
+    );
     res.json({
       success: true,
       message: "Watched movie IDs saved to JSON file",
-      filePath: filePath
+      filePath: filePath,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -310,17 +317,20 @@ router.post("/savewatchLaterMovies", async (req, res) => {
     const watchLaterMovieIds = user.watchLaterMovies;
     // Save to JSON file
     const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
-    fs.writeFileSync(filePath, JSON.stringify(watchLaterMovieIds, null, 2), 'utf8');
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(watchLaterMovieIds, null, 2),
+      "utf8"
+    );
     res.json({
       success: true,
       message: "Watch later movie IDs saved to JSON file",
-      filePath: filePath
+      filePath: filePath,
     });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 export default router;
