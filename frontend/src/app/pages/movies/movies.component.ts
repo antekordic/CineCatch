@@ -1,9 +1,9 @@
-import {Component, inject} from '@angular/core';
-import {ActivatedRoute, RouterLink} from "@angular/router";
-import {map, Observable, switchMap} from "rxjs";
-import {AsyncPipe} from "@angular/common";
-import {Movie} from "../../interfaces/movie.interface";
-import {MoviesService} from "../../services/movies.service";
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink } from "@angular/router";
+import { map, Observable, switchMap } from "rxjs";
+import { AsyncPipe } from "@angular/common";
+import { Movie } from "../../interfaces/movie.interface";
+import { MoviesService } from "../../services/movies.service";
 
 @Component({
   selector: 'app-services',
@@ -30,6 +30,7 @@ export class MoviesComponent {
 
       return null;
     })
+
   );
 
   public readonly movies$: Observable<Movie[]> = this.watchedFilter$.pipe(

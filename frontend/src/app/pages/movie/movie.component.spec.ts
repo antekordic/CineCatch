@@ -10,8 +10,8 @@ describe('MovieComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MovieComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(MovieComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -21,3 +21,4 @@ describe('MovieComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+
