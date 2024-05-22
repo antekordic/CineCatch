@@ -1,30 +1,35 @@
-
+:host {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  ;justify-content: space-around;
+  background-color: var(--color-primary);
+  height: 170px;
+}
 
 h1 {
-    text-align: center;
-    color: whitesmoke;
+  margin: 0;
+  text-align: center;
+  color: whitesmoke;
 }
 
 form {
-    text-align: center;
-    border-radius: 50%;
+  text-align: center;
+  border-radius: 50%;
 }
 
 input, button {
-    border: 0;
-    color: darkslateblue;
-    font-size: 1.2rem;
-   
-  }
-
-  button {
-    
-  }
+  border: 0;
+  color: darkslateblue;
+  font-size: 1.2rem;
+  padding: 10px 20px;
+  outline: none;
+}
 
 /*
 -----
 
- 
+
   button {
     display: none; // prevent being able to tab to it
     position: absolute;

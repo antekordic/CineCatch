@@ -16,16 +16,16 @@ export class HeaderComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
 
-  public loggedIn$ = this.authService.loggedIn$;
+  public readonly loggedIn$ = this.authService.loggedIn$;
 
   public readonly searchForm = this.fb.group({
     query: [''],
   });
 
-  public submitSearchQuery() {
+  public async submitSearchQuery() {
     const { query } = this.searchForm.value;
 
-    this.router.navigate(['/search'], {
+    await this.router.navigate(['/search'], {
       queryParams: {
         q: query,
       }

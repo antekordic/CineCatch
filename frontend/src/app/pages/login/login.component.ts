@@ -1,59 +1,48 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import {map, Observable, of, switchMap} from "rxjs";
+import {Router, RouterLink} from '@angular/router';
+import {map, Observable, of, Subscription, switchMap} from "rxjs";
 import {ActivatedRoute, RouterModule} from "@angular/router";
 import { USER_LOGIN_URL } from '../../shared/constants/urls';
 import { AuthService } from '../../services/auth.service';
 import { AsyncPipe } from '@angular/common';
+import {ToastService} from "../../services/toast.service";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, AsyncPipe],
+    imports: [ReactiveFormsModule, AsyncPipe, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
-  public loginForm!: FormGroup
+export class LoginComponent implements OnDestroy {
+  private readonly subscription = new Subscription();
+
+  private readonly router = inject(Router);
+  private readonly formBuilder = inject(FormBuilder);
+
+  public readonly loginForm: FormGroup = this.formBuilder.group({
+    email: ['', Validators.email],
+    password: ['', Validators.required]
+  })
 
   private readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
 
-  public loggedIn$ = this.authService.loggedIn$;
+  public login(){
+    const {email, password} = this.loginForm.value;
 
-  constructor(private formbuilder: FormBuilder,private http: HttpClient, private router: Router) { }
-
-  ngOnInit(): void {
-    this.loginForm = this.formbuilder.group({
-      email: [''],
-      password: ['', Validators.required]
-    })
-  }
-  login(){
-    this.http.get<any>(USER_LOGIN_URL)
-    .subscribe(res=>{
-      const user = res.find((a:any)=>{
-        return a.email === this.loginForm.value.email && a.password === this.loginForm.value.password 
-      });
-      if(user){
-        alert('Login Succesful');
-        this.loginForm.reset()
-      this.router.navigate([""])
-      }else{
-        alert("user not found")
-      }
-    },err=>{
-      alert("Something went wrong")
-    })
+    this.subscription.add(this.authService.login(email, password).subscribe({
+      next: async () => {
+        this.toastService.addSuccess(`Logged in successfully`);
+        await this.router.navigate(['/']);
+      },
+      error: (error) => this.toastService.addError(error.message),
+    }));
   }
 
-  public fakeLogin() {
-    this.authService.login('quatsch', 'passwort');
+  public ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
-
-  public fakeLogout() {
-    this.authService.logout();
-  }
-
 }
