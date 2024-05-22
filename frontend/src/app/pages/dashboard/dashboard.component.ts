@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, Input, OnDestroy } from '@angular/core';
 import { MovieComponent } from '../movie/movie.component';
 import { HttpClientModule } from '@angular/common/http';
-import {map, Observable, shareReplay, Subscription, switchMap, tap} from "rxjs";
+import { map, Observable, shareReplay, Subscription, switchMap, tap } from "rxjs";
 import { MovieInformationComponent } from '../../components/movie-information/movie-information.component';
 import { MoviesService } from '../../services/movies.service';
 import { ActivatedRoute } from '@angular/router';
@@ -10,17 +10,17 @@ import { AsyncPipe, JsonPipe } from '@angular/common';
 import { response } from 'express';
 
 @Component({
-  selector: 'app-tinder',
+  selector: 'app-dashboard',
   standalone: true,
   imports: [
     AsyncPipe,
     JsonPipe,
     MovieInformationComponent
   ],
-  templateUrl: './tinder.component.html',
-  styleUrl: './tinder.component.css'
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.css'
 })
-export class TinderComponent implements OnDestroy {
+export class DashboardComponent implements OnDestroy {
   private readonly subscription = new Subscription();
 
   private readonly route = inject(ActivatedRoute);
@@ -38,10 +38,10 @@ export class TinderComponent implements OnDestroy {
   public ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
- 
-  public addMovie(movie: Movie){
+
+  public addMovie(movie: Movie) {
     this.subscription.add(
-      this.moviesService.addMovieToWatchList(movie).subscribe({ 
+      this.moviesService.addMovieToWatchList(movie).subscribe({
         next: response => {
           console.log(response)
         }
@@ -49,9 +49,9 @@ export class TinderComponent implements OnDestroy {
     );
   }
 
-  public rateMovie(movie: Movie){
+  public rateMovie(movie: Movie) {
     this.subscription.add(
-      this.moviesService.addRatingToMovie(movie).subscribe({ 
+      this.moviesService.addRatingToMovie(movie).subscribe({
         next: response => {
           console.log(response)
         }

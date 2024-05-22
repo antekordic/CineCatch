@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TinderComponent } from './tinder.component';
+import { TinderComponent } from './dashboard.component';
 
 describe('TinderComponent', () => {
   let component: TinderComponent;
@@ -10,8 +10,8 @@ describe('TinderComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TinderComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(TinderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
