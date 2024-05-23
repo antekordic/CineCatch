@@ -32,3 +32,5 @@ const port = process.env.PORT || 4201;
 app.listen(port, () => {
   console.log(`Website served on http://localhost:${port}`);
 });
+
+//Nodemon.json -> stoppt das restarten des Servers bei änderungen des data ordners, kann bei problemen gelöscht werden

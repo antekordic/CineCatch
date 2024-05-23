@@ -275,6 +275,7 @@ const loadDataFromFile = (filename: string) => {
   return null;
 };
 
+/*alt
 // Route to save watched movie IDs to a JSON file
 router.post("/savewatchedMovies", async (req, res) => {
   try {
@@ -332,5 +333,43 @@ router.post("/savewatchLaterMovies", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+*/
+
+export async function saveWatchedMovies(req: Request, res: Response): Promise<void> {
+  const { email } = req.body;
+  const user = await UserModel.findOne({ email: email });
+  if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+  }
+  const watchedMovieIds = user.watchedMovies.map((movie) => movie.movieId);
+  const filePath = path.join(__dirname, `../data/${email}-watched.json`);
+  fs.writeFileSync(filePath, JSON.stringify(watchedMovieIds, null, 2), "utf8");
+  res.json({
+      success: true,
+      message: "Watched movie IDs saved to JSON file",
+      filePath: filePath,
+  });
+}
+
+export async function saveWatchLaterMovies(req: Request, res: Response): Promise<void> {
+  const { email } = req.body;
+  const user = await UserModel.findOne({ email: email });
+  if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+  }
+  const watchLaterMovieIds = user.watchLaterMovies;
+  const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
+  fs.writeFileSync(filePath, JSON.stringify(watchLaterMovieIds, null, 2), "utf8");
+  res.json({
+      success: true,
+      message: "Watch later movie IDs saved to JSON file",
+      filePath: filePath,
+  });
+}
+
+router.post("/savewatchedMovies", asyncHandler(saveWatchedMovies));
+router.post("/savewatchLaterMovies", asyncHandler(saveWatchLaterMovies));
 
 export default router;
