@@ -198,6 +198,8 @@ router.get("/fetchWatchLaterMovies/:email", async (req, res) => {
 });
 */
 
+
+// funktioniert 23.05.24
 // Fetch "watchLater" movies, first save them using user.router function
 router.post("/fetchWatchLaterMovies", async (req, res) => {
   try {
@@ -231,6 +233,7 @@ router.post("/fetchWatchedMovies", async (req, res) => {
     }
   }
 });
+
 
 //sets the structure for genre
 interface Genre {

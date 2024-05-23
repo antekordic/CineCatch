@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import { User, UserModel } from "../models/user.model";
@@ -371,6 +371,8 @@ export async function saveWatchLaterMovies(req: Request, res: Response): Promise
 }
 */
 
+
+//funktioniert 23.05.24
 export async function saveWatchedMovies(req: Request, res: Response): Promise<string[]> {
   const { email } = req.body;  // Get email from request body
   const user = await UserModel.findOne({ email: email });
@@ -394,7 +396,41 @@ export async function saveWatchLaterMovies(req: Request, res: Response): Promise
   fs.writeFileSync(filePath, JSON.stringify(watchLaterMovieIds, null, 2), "utf8");
   return watchLaterMovieIds;
 }
+
+// Route zum Speichern der IDs von angesehenen Filmen -> ungetestet
+router.post("/saveWatchedMovies", asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;  // E-Mail aus dem Request-Body extrahieren
+    const watchedMovieIds = await saveWatchedMovies(req, res);  // Aufruf der Funktion zum Speichern der Film-IDs
+    res.json({
+      success: true,
+      message: "Watched movie IDs saved successfully",
+      data: watchedMovieIds
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}));
+
+// Route zum Speichern der IDs von Filmen, die später angesehen werden sollen
+router.post("/saveWatchLaterMovies", asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;  // E-Mail aus dem Request-Body extrahieren
+    const watchLaterMovieIds = await saveWatchLaterMovies(req, res);  // Aufruf der Funktion zum Speichern der Film-IDs
+    res.json({
+      success: true,
+      message: "Watch later movie IDs saved successfully",
+      data: watchLaterMovieIds
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}));
+
 //router.post("/savewatchedMovies", asyncHandler(saveWatchedMovies));
 //router.post("/savewatchLaterMovies", asyncHandler(saveWatchLaterMovies));
+
 
 export default router;
