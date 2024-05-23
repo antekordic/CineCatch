@@ -333,7 +333,8 @@ router.post("/savewatchLaterMovies", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-*/
+
+V2 -> funktioniert über Postman
 
 export async function saveWatchedMovies(req: Request, res: Response): Promise<void> {
   const { email } = req.body;
@@ -368,8 +369,32 @@ export async function saveWatchLaterMovies(req: Request, res: Response): Promise
       filePath: filePath,
   });
 }
+*/
 
-router.post("/savewatchedMovies", asyncHandler(saveWatchedMovies));
-router.post("/savewatchLaterMovies", asyncHandler(saveWatchLaterMovies));
+export async function saveWatchedMovies(req: Request, res: Response): Promise<string[]> {
+  const { email } = req.body;  // Get email from request body
+  const user = await UserModel.findOne({ email: email });
+  if (!user) {
+      throw new Error("User not found");
+  }
+  const watchedMovieIds = user.watchedMovies.map((movie) => movie.movieId);
+  const filePath = path.join(__dirname, `../data/${email}-watched.json`);
+  fs.writeFileSync(filePath, JSON.stringify(watchedMovieIds, null, 2), "utf8");
+  return watchedMovieIds;
+}
+
+export async function saveWatchLaterMovies(req: Request, res: Response): Promise<string[]> {
+  const { email } = req.body;  // Get email from request body
+  const user = await UserModel.findOne({ email: email });
+  if (!user) {
+      throw new Error("User not found");
+  }
+  const watchLaterMovieIds = user.watchLaterMovies;
+  const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
+  fs.writeFileSync(filePath, JSON.stringify(watchLaterMovieIds, null, 2), "utf8");
+  return watchLaterMovieIds;
+}
+//router.post("/savewatchedMovies", asyncHandler(saveWatchedMovies));
+//router.post("/savewatchLaterMovies", asyncHandler(saveWatchLaterMovies));
 
 export default router;

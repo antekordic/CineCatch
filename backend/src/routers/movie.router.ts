@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
+import { saveWatchLaterMovies, saveWatchedMovies } from './user.router';
 
 const router = Router();
 
@@ -147,6 +148,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+/*
 // requires a current json -> execute the user route savewatchedMovies beforehand
 // Sends “watched” movies from the user json to tmdb and outputs the response. Title, release date, original language, and genre as map
 router.get("/fetchWatchedMovies/:email", async (req, res) => {
@@ -191,6 +193,41 @@ router.get("/fetchWatchLaterMovies/:email", async (req, res) => {
       res
         .status(500)
         .json({ success: false, message: "An unknown error occurred" });
+    }
+  }
+});
+*/
+
+// Fetch "watchLater" movies, first save them using user.router function
+router.post("/fetchWatchLaterMovies", async (req, res) => {
+  try {
+    const { email } = req.body;  // Get email from request body
+    const watchLaterMovieIds = await saveWatchLaterMovies(req, res);
+    const movieDetails = await fetchMovieDetails(watchLaterMovieIds);
+    res.json({ success: true, email, movies: movieDetails });
+  } catch (error: unknown) {
+    console.error("Error:", error);
+    if (error instanceof Error) {
+      res.status(500).json({ success: false, message: error.message });
+    } else {
+      res.status(500).json({ success: false, message: "An unknown error occurred" });
+    }
+  }
+});
+
+// Fetch "watched" movies, first save them using user.router function
+router.post("/fetchWatchedMovies", async (req, res) => {
+  try {
+    const { email } = req.body;  // Get email from request body
+    const watchedMovieIds = await saveWatchedMovies(req, res);
+    const movieDetails = await fetchMovieDetails(watchedMovieIds);
+    res.json({ success: true, email, movies: movieDetails });
+  } catch (error: unknown) {
+    console.error("Error:", error);
+    if (error instanceof Error) {
+      res.status(500).json({ success: false, message: error.message });
+    } else {
+      res.status(500).json({ success: false, message: "An unknown error occurred" });
     }
   }
 });
