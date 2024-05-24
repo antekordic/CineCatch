@@ -2,11 +2,20 @@ import { Router, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import { User, UserModel } from "../models/user.model";
-import { HTTP_BAD_REQUEST } from "../constants/http_status";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
 import { LoginDTO, RegisterDTO, TokenResponseDTO } from "../dtos/user.dto";
+import {
+  HTTP_NO_CONTENT,
+  HTTP_BAD_REQUEST,
+  HTTP_UNAUTHORIZED,
+  HTTP_FORBIDDEN,
+  HTTP_NOT_FOUND,
+  HTTP_CONFLICT,
+  HTTP_INTERNAL_SERVER_ERROR
+} from "../constants/http_status";
+
 
 const router = Router();
 
@@ -44,7 +53,7 @@ router.post(
       req.session.userId = user.id; // Save user ID in session
       res.json(tokenResponse);
     } else {
-      res.status(400).json({ error: "Username or password is invalid!" });
+      res.status(HTTP_UNAUTHORIZED).json({ error: "Username or password is invalid!" });
     }
   })
 );
@@ -56,7 +65,7 @@ router.post(
     const user = await UserModel.findOne({ email });
 
     if (user) {
-      res.status(400).json({ error: "User already exists, please login!" });
+      res.status(HTTP_FORBIDDEN).json({ error: "User already exists, please login!" });
       return;
     }
 
@@ -94,7 +103,7 @@ router.post("/watched", async (req, res) => {
     // Find the user by email
     let user = await UserModel.findOne({ email: email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
 
     // Check if the movie ID already exists in the watched list
@@ -103,7 +112,7 @@ router.post("/watched", async (req, res) => {
     );
     if (existingMovie) {
       return res
-        .status(400)
+        .status(HTTP_FORBIDDEN)
         .json({ error: "Movie ID already exists in the watched list" });
     }
 
@@ -121,7 +130,7 @@ router.post("/watched", async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
@@ -133,7 +142,7 @@ router.put("/watched", async (req, res) => {
     // Find the user by email
     let user = await UserModel.findOne({ email: email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
 
     // Find the movie in the watched list
@@ -142,7 +151,7 @@ router.put("/watched", async (req, res) => {
     );
     if (movieIndex === -1) {
       return res
-        .status(404)
+        .status(HTTP_NO_CONTENT)
         .json({ error: "Movie not found in the watched list" });
     }
 
@@ -153,7 +162,7 @@ router.put("/watched", async (req, res) => {
     res.json({ success: true, message: "Rating updated successfully" });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
@@ -165,13 +174,13 @@ router.post("/watchLater", async (req, res) => {
     // Find the user by email
     let user = await UserModel.findOne({ email: email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
 
     // Check if the movie ID already exists in the watch later list
     if (user.watchLaterMovies.includes(movieId)) {
       return res
-        .status(400)
+        .status(HTTP_CONFLICT)
         .json({ error: "Movie ID already exists in the watch later list" });
     }
 
@@ -185,7 +194,7 @@ router.post("/watchLater", async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
@@ -197,7 +206,7 @@ router.delete("/watched", async (req, res) => {
     // Find the user by email
     let user = await UserModel.findOne({ email: email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
 
     // Find the index of the movie in the watched list
@@ -206,7 +215,7 @@ router.delete("/watched", async (req, res) => {
     );
     if (index === -1) {
       return res
-        .status(404)
+        .status(HTTP_NO_CONTENT)
         .json({ error: "Movie not found in the watched list" });
     }
 
@@ -220,7 +229,7 @@ router.delete("/watched", async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
@@ -232,14 +241,14 @@ router.delete("/watchLater", async (req, res) => {
     // Find the user by email
     let user = await UserModel.findOne({ email: email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
 
     // Find the index of the movie in the watch later list
     const index = user.watchLaterMovies.indexOf(movieId);
     if (index === -1) {
       return res
-        .status(404)
+        .status(HTTP_NO_CONTENT)
         .json({ error: "Movie not found in the watch later list" });
     }
 
@@ -253,7 +262,7 @@ router.delete("/watchLater", async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
@@ -282,7 +291,7 @@ router.post("/savewatchedMovies", async (req, res) => {
     // Find the user by email
     const user = await UserModel.findOne({ email: email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
     // Extract watched movie IDs
     const watchedMovieIds = user.watchedMovies.map((movie) => movie.movieId);
@@ -300,7 +309,7 @@ router.post("/savewatchedMovies", async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
@@ -311,7 +320,7 @@ router.post("/savewatchLaterMovies", async (req, res) => {
     // Find the user by email
     const user = await UserModel.findOne({ email: email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
     // Extract watch later movie IDs
     const watchLaterMovieIds = user.watchLaterMovies;
@@ -329,7 +338,7 @@ router.post("/savewatchLaterMovies", async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
