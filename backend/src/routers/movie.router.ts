@@ -148,59 +148,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-/*
-// requires a current json -> execute the user route savewatchedMovies beforehand
-// Sends “watched” movies from the user json to tmdb and outputs the response. Title, release date, original language, and genre as map
-router.get("/fetchWatchedMovies/:email", async (req, res) => {
-  const { email } = req.params;
-  const filePath = path.join(__dirname, `../data/${email}-watched.json`);
-
-  try {
-    const watchedMovies: string[] = JSON.parse(
-      fs.readFileSync(filePath, "utf8")
-    );
-    const movieDetails = await fetchMovieDetails(watchedMovies);
-    res.json({ success: true, email, movies: movieDetails });
-  } catch (error: unknown) {
-    console.error("Error fetching movie details:", error);
-    if (error instanceof Error) {
-      res.status(500).json({ success: false, message: error.message });
-    } else {
-      res
-        .status(500)
-        .json({ success: false, message: "An unknown error occurred" });
-    }
-  }
-});
-
-// requires a current json -> execute the user route savewatchLater beforehand
-// Sends "watchLaterMovies" movies from the user json to tmdb and outputs the response. Title, release date, original language, and genre as map
-router.get("/fetchWatchLaterMovies/:email", async (req, res) => {
-  const { email } = req.params;
-  const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
-
-  try {
-    const watchLaterMovies: string[] = JSON.parse(
-      fs.readFileSync(filePath, "utf8")
-    );
-    const movieDetails = await fetchMovieDetails(watchLaterMovies);
-    res.json({ success: true, email, movies: movieDetails });
-  } catch (error: unknown) {
-    console.error("Error fetching movie details:", error);
-    if (error instanceof Error) {
-      res.status(500).json({ success: false, message: error.message });
-    } else {
-      res
-        .status(500)
-        .json({ success: false, message: "An unknown error occurred" });
-    }
-  }
-});
-*/
-
-
-// funktioniert 23.05.24
-// Fetch "watchLater" movies, first save them using user.router function
+// calls savewatchlaterMovies first to save them using user.router function
 router.post("/fetchWatchLaterMovies", async (req, res) => {
   try {
     const { email } = req.body;  // Get email from request body
@@ -217,7 +165,7 @@ router.post("/fetchWatchLaterMovies", async (req, res) => {
   }
 });
 
-// Fetch "watched" movies, first save them using user.router function
+// calls save watchedMovies first to save them using user.router function
 router.post("/fetchWatchedMovies", async (req, res) => {
   try {
     const { email } = req.body;  // Get email from request body
@@ -261,7 +209,7 @@ async function fetchMovieDetails(movieIds: string[]) {
         );
       }
       return {
-        //if required, the queried id can be returned again for better allocation
+        //if required, the queried id can be returned again for better allocation (or the description)
         title: data.title,
         releaseDate: data.release_date,
         originalLanguage: data.original_language,
