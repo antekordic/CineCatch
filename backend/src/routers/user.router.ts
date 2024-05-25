@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import { User, UserModel } from "../models/user.model";
@@ -284,62 +284,62 @@ const loadDataFromFile = (filename: string) => {
   return null;
 };
 
-// Route to save watched movie IDs to a JSON file
-router.post("/savewatchedMovies", async (req, res) => {
-  try {
-    const { email } = req.body;
-    // Find the user by email
-    const user = await UserModel.findOne({ email: email });
-    if (!user) {
-      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
-    }
-    // Extract watched movie IDs
-    const watchedMovieIds = user.watchedMovies.map((movie) => movie.movieId);
-    // Save to JSON file
-    const filePath = path.join(__dirname, `../data/${email}-watched.json`);
-    fs.writeFileSync(
-      filePath,
-      JSON.stringify(watchedMovieIds, null, 2),
-      "utf8"
-    );
-    res.json({
-      success: true,
-      message: "Watched movie IDs saved to JSON file",
-      filePath: filePath,
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
+// saves movies in /data/*email*-watched.json
+export async function saveWatchedMovies(req: Request, res: Response): Promise<string[]> {
+  const { email } = req.body;  // Get email from request body
+  const user = await UserModel.findOne({ email: email });
+  if (!user) {
+      throw new Error("User not found");
   }
-});
+  const watchedMovieIds = user.watchedMovies.map((movie) => movie.movieId);
+  const filePath = path.join(__dirname, `../data/${email}-watched.json`);
+  fs.writeFileSync(filePath, JSON.stringify(watchedMovieIds, null, 2), "utf8");
+  return watchedMovieIds;
+}
 
-// Route to save watch later movie IDs to a JSON file
-router.post("/savewatchLaterMovies", async (req, res) => {
+// saves movies in /data/*email*-watchLater.json
+export async function saveWatchLaterMovies(req: Request, res: Response): Promise<string[]> {
+  const { email } = req.body;  // Get email from request body
+  const user = await UserModel.findOne({ email: email });
+  if (!user) {
+      throw new Error("User not found");
+  }
+  const watchLaterMovieIds = user.watchLaterMovies;
+  const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
+  fs.writeFileSync(filePath, JSON.stringify(watchLaterMovieIds, null, 2), "utf8");
+  return watchLaterMovieIds;
+}
+
+// Route for saving the IDs of watched movies -> calls function saveWatchedMovies
+router.post("/saveWatchedMovies", asyncHandler(async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
-    // Find the user by email
-    const user = await UserModel.findOne({ email: email });
-    if (!user) {
-      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
-    }
-    // Extract watch later movie IDs
-    const watchLaterMovieIds = user.watchLaterMovies;
-    // Save to JSON file
-    const filePath = path.join(__dirname, `../data/${email}-watchLater.json`);
-    fs.writeFileSync(
-      filePath,
-      JSON.stringify(watchLaterMovieIds, null, 2),
-      "utf8"
-    );
+    const { email } = req.body;  // Get email from request body
+    const watchedMovieIds = await saveWatchedMovies(req, res);  // Calling up the function for saving the film IDs
     res.json({
       success: true,
-      message: "Watch later movie IDs saved to JSON file",
-      filePath: filePath,
+      message: "Watched movie IDs saved successfully",
+      data: watchedMovieIds
     });
   } catch (error) {
     console.error("Error:", error);
     res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
-});
+}));
+
+// Route for saving the IDs of movies to be watched later -> calls function saveWatchLaterMovies
+router.post("/saveWatchLaterMovies", asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;  // Get email from request body
+    const watchLaterMovieIds = await saveWatchLaterMovies(req, res);  // Calling up the function for saving the film IDs
+    res.json({
+      success: true,
+      message: "Watch later movie IDs saved successfully",
+      data: watchLaterMovieIds
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
+  }
+}));
 
 export default router;
