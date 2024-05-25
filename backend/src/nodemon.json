@@ -1,0 +1,7 @@
+{
+    "ignore": ["data/*", "*.json"],
+    "watch": ["src/"],
+    "ext": "ts",
+    "exec": "ts-node server.ts"
+  }
+  
