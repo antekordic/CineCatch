@@ -2,6 +2,15 @@ import { Router, Request, Response } from "express";
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
+import {
+  HTTP_NO_CONTENT,
+  HTTP_BAD_REQUEST,
+  HTTP_UNAUTHORIZED,
+  HTTP_FORBIDDEN,
+  HTTP_NOT_FOUND,
+  HTTP_CONFLICT,
+  HTTP_INTERNAL_SERVER_ERROR
+} from "../constants/http_status";
 import { saveWatchLaterMovies, saveWatchedMovies } from './user.router';
 
 const router = Router();
@@ -21,7 +30,7 @@ router.get(
   ) => {
     // Check if there is an active session
     if (!req.session.userId) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.status(HTTP_UNAUTHORIZED).json({ error: "Unauthorized" });
     }
 
     // Initialize session variables if they don't exist
@@ -49,11 +58,11 @@ router.get(
           movieIndex = 0;
           currentPage++;
         } else {
-          return res.status(404).json({ error: "No movies found" });
+          return res.status(HTTP_NO_CONTENT).json({ error: "No movies found" });
         }
       } catch (error) {
         console.error("Error fetching popular movies:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
+        return res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
       }
     }
 
@@ -76,7 +85,7 @@ router.get("/search", async (req, res) => {
     const query = req.query.query?.toString(); // Ensure query is accessed as a string
     const page = req.query.page || 1; // Get the page number, default to 1 if not provided
     if (!query) {
-      return res.status(400).json({ error: "Query parameter is missing" });
+      return res.status(HTTP_BAD_REQUEST).json({ error: "Query parameter is missing" });
     }
 
     // Build the URL for the search API
@@ -101,7 +110,7 @@ router.get("/search", async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
@@ -144,7 +153,7 @@ router.get("/", async (req, res) => {
     res.json(moviesData);
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 });
 
@@ -158,9 +167,11 @@ router.post("/fetchWatchLaterMovies", async (req, res) => {
   } catch (error: unknown) {
     console.error("Error:", error);
     if (error instanceof Error) {
-      res.status(500).json({ success: false, message: error.message });
+      res.status(HTTP_INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     } else {
-      res.status(500).json({ success: false, message: "An unknown error occurred" });
+      res
+        .status(HTTP_INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: "An unknown error occurred" });
     }
   }
 });
@@ -175,9 +186,11 @@ router.post("/fetchWatchedMovies", async (req, res) => {
   } catch (error: unknown) {
     console.error("Error:", error);
     if (error instanceof Error) {
-      res.status(500).json({ success: false, message: error.message });
+      res.status(HTTP_INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     } else {
-      res.status(500).json({ success: false, message: "An unknown error occurred" });
+      res
+        .status(HTTP_INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: "An unknown error occurred" });
     }
   }
 });
