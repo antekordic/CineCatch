@@ -4,8 +4,8 @@ import {
   loginUser,
   addToWatched,
   addToWatchLater,
-  getWatchedMovies,
-  getWatchLaterMovies,
+  getWatchedIDs,
+  getWatchLaterIDs,
   updateWatchedMovieRating,
   deleteWatchedMovie,
   deleteWatchLaterMovie,
@@ -14,14 +14,19 @@ import { authenticateJWT } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.post("/watched", authenticateJWT, addToWatched);
-router.post("/watchlater", authenticateJWT, addToWatchLater);
-router.get("/watched", authenticateJWT, getWatchedMovies);
-router.get("/watchlater", authenticateJWT, getWatchLaterMovies);
-router.put("/watched/rating", authenticateJWT, updateWatchedMovieRating);
-router.delete("/watched", authenticateJWT, deleteWatchedMovie);
-router.delete("/watchlater", authenticateJWT, deleteWatchLaterMovie);
+// User registration and login
+router.post("/register", registerUser); // Register a new user
+router.post("/login", loginUser); // Login an existing user
+
+// Watched movies
+router.post("/watched", authenticateJWT, addToWatched); // Add movie to watched list
+router.put("/watched/rating", authenticateJWT, updateWatchedMovieRating); // Update rating of a watched movie
+router.get("/watchedIds", authenticateJWT, getWatchedIDs); // Get all watch later Ids (to get Movies, see to movie.router.ts)
+router.delete("/watched", authenticateJWT, deleteWatchedMovie); // Remove movie from watched list
+
+// Watch later movies
+router.post("/watchLater", authenticateJWT, addToWatchLater); // Add movie to watch later list
+router.get("/watchLaterIds", authenticateJWT, getWatchLaterIDs); // Get all watch later Ids (to get Movies, see to movie.router.ts)
+router.delete("/watchLater", authenticateJWT, deleteWatchLaterMovie); // Remove movie from watch later list
 
 export default router;
