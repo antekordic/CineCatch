@@ -1,19 +1,9 @@
-export interface UserResponseDto {
-  id: string;
-  email: string;
-  name: string;
-}
-
-export interface UserSessionDto {
-  userId: string;
-}
-
-export interface LoginDTO {
+export interface RegisterDTO {
   email: string;
   password: string;
 }
 
-export interface RegisterDTO {
+export interface LoginDTO {
   email: string;
   password: string;
 }
@@ -24,6 +14,20 @@ export interface TokenResponseDTO {
   token: string;
 }
 
-export interface LogoutResponseDTO {
-  message: string;
+export interface AddToWatchedMovieDTO {
+  movieId: string;
+  rating?: number;
+}
+
+export interface AddToWatchLaterMovieDTO {
+  movieId: string;
+}
+
+export interface UpdateWatchedMovieRatingDTO {
+  movieId: string;
+  rating: number;
+}
+
+export interface DeleteMovieDTO {
+  movieId: string;
 }
