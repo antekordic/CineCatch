@@ -1,0 +1,33 @@
+:host {
+  display: flex;
+  position: relative;
+  flex-direction: row-reverse;
+}
+
+.radio-star {
+  display: none;
+}
+
+.radio-star + label {
+  font-size: 2rem;
+  color: var(--color-grey);
+}
+
+.radio-star + label:hover,
+.radio-star + label:hover ~ label{
+  cursor: pointer;
+  color: var(--color-secondary);
+}
+
+.radio-star:checked + label,
+.radio-star:checked + label ~ label{
+  color: var(--color-secondary);
+}
+
+.radio-star:hover {
+  cursor: pointer;
+}
+
+.spacer {
+  flex: 1;
+}

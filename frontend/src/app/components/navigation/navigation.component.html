@@ -1,12 +1,48 @@
 <ul class="navigation">
   @if (loggedIn$ | async; as loggedIn) {
-    <li class="navigation__item"><a class="navigation-link" routerLink="/">Start</a></li>
-    <li class="navigation__item"><a class="navigation-link" routerLink="/movies">Movies</a></li>
-    <li class="navigation__item"><a class="navigation-link" routerLink="/movies" [queryParams]="{watched: false}">Unwatched/Watch Later</a></li>
-    <li class="navigation__item"><a class="navigation-link" routerLink="/movies" [queryParams]="{watched: true}">Watched</a></li>
-    <li class="navigation__item"><a class="navigation-link navigation-link--logout" (click)="logout()" href="javascript:;">Logout</a></li>
+    <li class="navigation__item">
+      <a class="navigation-link"
+         routerLink="/"
+         routerLinkActive="navigation-link--active"
+         [routerLinkActiveOptions]="{exact: true}"
+      >Start</a>
+    </li>
+    <li class="navigation__item">
+      <a class="navigation-link"
+         routerLink="/movies"
+         [queryParams]="{ type: MovieFilterType.WatchLater }"
+         routerLinkActive="navigation-link--active"
+         [routerLinkActiveOptions]="{exact: true}"
+      >Watch Later</a>
+    </li>
+    <li class="navigation__item">
+      <a class="navigation-link"
+         routerLink="/movies"
+         [queryParams]="{ type: MovieFilterType.Watched }"
+         routerLinkActive="navigation-link--active"
+         [routerLinkActiveOptions]="{exact: true}"
+      >Watched</a>
+    </li>
+    <li class="navigation__item">
+      <a class="navigation-link navigation-link--logout"
+         (click)="logout()"
+         href="javascript:;"
+      >Logout</a>
+    </li>
   } @else {
-    <li class="navigation__item"><a class="navigation-link" routerLink="/login">Login</a></li>
-    <li class="navigation__item"><a class="navigation-link" routerLink="/signup">Sign Up</a></li>
+    <li class="navigation__item">
+      <a class="navigation-link"
+         routerLink="/login"
+         routerLinkActive="navigation-link--active"
+         [routerLinkActiveOptions]="{exact: true}"
+      >Login</a>
+    </li>
+    <li class="navigation__item">
+      <a class="navigation-link"
+         routerLink="/signup"
+         routerLinkActive="navigation-link--active"
+         [routerLinkActiveOptions]="{exact: true}"
+      >Sign Up</a>
+    </li>
   }
 </ul>

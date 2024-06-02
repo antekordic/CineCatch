@@ -1,0 +1,5 @@
+@if (movie$ | async; as movie) {
+  <app-movie-information [movie]="movie">
+    <button class="mv-button mv-button--cancel" button right (click)="showNextMovie()">Next</button>
+  </app-movie-information>
+}

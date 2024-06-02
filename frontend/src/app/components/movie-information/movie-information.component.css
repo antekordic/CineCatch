@@ -1,9 +1,48 @@
-.box {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+:host {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  margin-top: var(--spacing-default-double);
 }
 
-.plot {
-    background-color: #ffea4e;
+.poster {
+  width: 300px;
+  height: 450px;
+  background-color: var(--color-grey-light);
 }
+
+.details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-left: var(--spacing-default-double);
+}
+
+.details__headline {
+  font-size: 2.5rem;
+  margin-top: 0;
+}
+
+.details__overview {
+  margin-top: 0;
+  margin-bottom: var(--spacing-default-double);
+  line-height: 1.5rem;
+}
+
+.details__rating {
+  margin-top: var(--spacing-default-double);
+  margin-bottom: var(--spacing-default-double);
+}
+
+.details__spacer {
+  flex: 1;
+}
+
+.details__buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.buttons__left {}
+.buttons__right {}

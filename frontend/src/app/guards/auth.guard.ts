@@ -9,7 +9,6 @@ export const authGuard: CanActivateFn = (route, state): Observable<boolean | Url
   const router = inject(Router);
 
   return authService.loggedIn$.pipe(
-    tap(x => console.log('tap', x)),
     map(loggedIn => {
       const authType = route.data['authType'] || AuthType.Public;
 

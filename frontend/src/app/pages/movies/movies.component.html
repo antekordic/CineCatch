@@ -1,26 +1,5 @@
-<p>movies works!</p>
-
-Movies Filter {{watchedFilter$ | async}}
-
-<ul>
-  @for(movie of movies$ | async; track movie.id) {
-
-    <li>
-      <div class="container"> 
-        <div class="plakat-container">
-          <img class="plakat" :src="https://www.themoviedb.org/t/p/w1280/jy0CKGuj5gcWn6DAnJ4HEdUgjJO.jpg">
-        </div>
-        <div class="titel">
-          <a [routerLink]="['/movies', movie.id]">{{ movie.title }}</a> <br/>
-          {{movie.genre}}
-        </div>
-      </div>
-    </li>
-  }
-</ul>
-
-
-
-<!--- 
-<li><a [routerLink]="['/movies', movie.id]">{{ movie.title }}</a></li>
--->
+@for(movie of movies$ | async; track movie.id) {
+  <app-movie-information [movie]="movie" (changedList)="reloadList()"  />
+} @empty {
+  <p>You do not have any movies in this list.</p>
+}

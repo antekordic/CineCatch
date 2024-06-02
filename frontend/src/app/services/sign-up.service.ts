@@ -1,5 +1,5 @@
 import {inject, Injectable} from "@angular/core";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import {USER_REGISTER_URL} from "../shared/constants/urls";
 import {catchError, throwError} from "rxjs";
 

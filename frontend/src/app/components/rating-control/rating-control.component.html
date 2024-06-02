@@ -1,0 +1,13 @@
+<div class="spacer"></div>
+@for (stdValue of stdValues; track $index) {
+  <input
+    [id]="uuid + stdValue"
+    [value]="stdValue"
+    (change)="handleChange($event)"
+    [checked]="value == stdValue"
+    class="radio-star"
+    type="radio"
+    name="stars"
+  />
+  <label [for]="uuid + stdValue">★</label>
+}
