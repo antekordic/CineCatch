@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {catchError, map, ReplaySubject, tap, throwError} from 'rxjs';
 import {LocalStorageService} from "./local-storage.service";
-import {HttpClient} from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import {USER_LOGIN_URL} from "../shared/constants/urls";
 import {User} from "../shared/models/User";
 
@@ -15,11 +15,10 @@ export class AuthService {
   private readonly localStorage = inject(LocalStorageService);
 
   private readonly jwt$$ = new ReplaySubject<string | null>(1);
+  public readonly jwt$ = this.jwt$$.asObservable();
   public readonly loggedIn$ = this.jwt$$.pipe(
     map(jwt => !!jwt),
   );
-
-  constructor() { }
 
   public checkAuthentication(): void {
     // TODO: check against backend

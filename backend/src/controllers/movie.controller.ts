@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import fetch from "node-fetch";
-import { UserModel } from "../models/user.model";
+import {UserDocument, UserModel} from "../models/user.model";
 import {
   HTTP_NO_CONTENT,
   HTTP_BAD_REQUEST,
@@ -12,11 +12,12 @@ import {
   HTTP_CREATED,
 } from "../constants/http_status";
 import { AuthRequest } from "../middleware/auth.middleware";
-import { MovieDetailDTO } from "../dtos/movie.dto";
+import {MovieDetailDTO, MovieUserContextDTO} from "../../../shared/dtos/movie.dto";
 
 // Function to fetch movie details from TMDB
 const fetchMovieDetails = async (
-  movieIds: string[]
+  movieIds: string[],
+  user?: UserDocument
 ): Promise<MovieDetailDTO[]> => {
   const movieDetails = await Promise.all(
     movieIds.map(async (movieId) => {
@@ -45,10 +46,33 @@ const fetchMovieDetails = async (
   );
 
   // Filter out any null values
-  return movieDetails.filter(
+  return Promise.all(movieDetails.filter(
     (movie): movie is MovieDetailDTO => movie !== null
-  );
+  ).map(async (movie) => {
+    if (!user) {
+      return movie;
+    }
+
+    return addUserContext(movie, user);
+  }));
+
+
 };
+
+export const addUserContext = async (movie: MovieDetailDTO, user: UserDocument): Promise<MovieDetailDTO & MovieUserContextDTO> => {
+  const watched = !!user.watchedMovies.find(({movieId}) => movieId === movie.id.toString());
+  const watchLater = !!user.watchLaterMovies.find(watchLaterMovieId => watchLaterMovieId === movie.id.toString());
+  const rating = user.watchedMovies.find(({movieId}) => movieId === movie.id.toString())?.rating || 0;
+
+  return {
+    ...movie,
+    user: {
+      watched,
+      watchLater,
+      rating
+    }
+  }
+}
 
 // Controller to get the next popular movie for a user
 export const getNextPopularMovie = async (req: AuthRequest, res: Response) => {
@@ -80,7 +104,7 @@ export const getNextPopularMovie = async (req: AuthRequest, res: Response) => {
     const nextMovie = data.results[movieIndex];
 
     // Fetch additional details for the next movie
-    const detailedMovie = await fetchMovieDetails([nextMovie.id.toString()]);
+    const detailedMovie = await fetchMovieDetails([nextMovie.id.toString()], user);
 
     // Update user data
     user.currentPage =
@@ -101,6 +125,11 @@ export const getNextPopularMovie = async (req: AuthRequest, res: Response) => {
 // Controller to search movies by a query
 export const searchMovies = async (req: AuthRequest, res: Response) => {
   try {
+    const user = await UserModel.findById(req.user!.id);
+    if (!user) {
+      return res.status(HTTP_BAD_REQUEST).json({ error: "User not found" });
+    }
+
     const query = req.query.query?.toString();
     const page = req.query.page || 1;
 
@@ -127,7 +156,8 @@ export const searchMovies = async (req: AuthRequest, res: Response) => {
     const data = await response.json();
 
     const movies: MovieDetailDTO[] = await fetchMovieDetails(
-      data.results.map((movie: any) => movie.id.toString())
+      (data.results || []).map((movie: any) => movie.id.toString()),
+        user
     );
 
     res.status(HTTP_OK).json(movies);
@@ -147,7 +177,7 @@ export const getWatchLaterMovies = async (req: AuthRequest, res: Response) => {
       return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
     const watchLaterMovieIds = user.watchLaterMovies;
-    const movieDetails = await fetchMovieDetails(watchLaterMovieIds);
+    const movieDetails = await fetchMovieDetails(watchLaterMovieIds, user);
     res.status(HTTP_OK).json({ success: true, movies: movieDetails });
   } catch (error: unknown) {
     console.error("Error:", error);
@@ -171,7 +201,7 @@ export const getWatchedMovies = async (req: AuthRequest, res: Response) => {
       return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
     }
     const watchedMovieIds = user.watchedMovies.map((movie) => movie.movieId);
-    const movieDetails = await fetchMovieDetails(watchedMovieIds);
+    const movieDetails = await fetchMovieDetails(watchedMovieIds, user);
     res.status(HTTP_OK).json({ success: true, movies: movieDetails });
   } catch (error: unknown) {
     console.error("Error:", error);
@@ -190,6 +220,11 @@ export const getWatchedMovies = async (req: AuthRequest, res: Response) => {
 // Controller to get movies by their IDs
 export const getMoviesByIds = async (req: AuthRequest, res: Response) => {
   try {
+    const user = await UserModel.findById(req.user!.id);
+    if (!user) {
+      return res.status(HTTP_FORBIDDEN).json({ error: "User not found" });
+    }
+
     // Check if ids parameter exists in the query
     if (!req.query.ids || typeof req.query.ids !== "string") {
       return res
@@ -199,7 +234,7 @@ export const getMoviesByIds = async (req: AuthRequest, res: Response) => {
 
     // Extract movie IDs from request parameters
     const movieIds = (req.query.ids as string).split(",");
-    const movieDetails = await fetchMovieDetails(movieIds);
+    const movieDetails = await fetchMovieDetails(movieIds, user);
 
     res.status(HTTP_OK).json(movieDetails);
   } catch (error) {

@@ -5,6 +5,7 @@ import {Movie} from "../../interfaces/movie.interface";
 import {MoviesService} from "../../services/movies.service";
 import {AsyncPipe, JsonPipe} from "@angular/common";
 import { MovieInformationComponent } from '../../components/movie-information/movie-information.component';
+import {MovieDetailDTO} from "@movie-app/shared";
 
 @Component({
   selector: 'app-movie',
@@ -18,7 +19,7 @@ import { MovieInformationComponent } from '../../components/movie-information/mo
   styleUrl: './movie.component.css'
 })
 export class MovieComponent {
-  
+
   private readonly route = inject(ActivatedRoute);
   private readonly moviesService = inject(MoviesService);
 
@@ -26,7 +27,7 @@ export class MovieComponent {
     map(params => params['id']),
   );
 
-  public movie$: Observable<Movie | null> = this.movieId$.pipe(
+  public movie$: Observable<MovieDetailDTO | null> = this.movieId$.pipe(
     tap(console.info),
     switchMap(movieId => this.moviesService.getMovieById(movieId)),
   );

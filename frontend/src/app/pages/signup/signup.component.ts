@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { USER_REGISTER_URL } from '../../shared/constants/urls';
 import {SignUpService} from "../../services/sign-up.service";
 import {catchError, of, Subscription, throwError} from "rxjs";

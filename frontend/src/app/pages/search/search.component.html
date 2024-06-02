@@ -1,9 +1,13 @@
-<p>search works!</p>
+<h1>Search results for "{{ query$ | async }}"</h1>
 
-Search Query: {{ query$ | async }}
+@for(movie of searchResult$ | async; track movie.id) {
+  <app-movie-information [movie]="movie"></app-movie-information>
+}
 
-<ul>
-  @for(movie of searchResult$ | async; track movie.id) {
-    <li><a [routerLink]="['/movies', movie.id]">{{ movie.title }}</a></li>
-  }
-</ul>
+@if (page$ | async; as currentPage) {
+<div class="paging">
+  <button class="mv-button mv-button--submit paging__previous" (click)="previousPage(currentPage)">previous page</button>
+  <div class="paging__spacer"></div>
+  <button class="mv-button mv-button--submit paging__next" (click)="nextPage(currentPage)">next page</button>
+</div>
+}

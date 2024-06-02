@@ -60,7 +60,8 @@
               "buildTarget": "frontend:build:production"
             },
             "development": {
-              "buildTarget": "frontend:build:development"
+              "buildTarget": "frontend:build:development",
+              "proxyConfig": "src/proxy.conf.mjs"
             }
           },
           "defaultConfiguration": "development"

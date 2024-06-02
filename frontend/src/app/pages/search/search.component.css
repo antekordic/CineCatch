@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.paging {
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-default-double);
+  margin-bottom: var(--spacing-default-double);
+}
+
+.paging__previous {
+
+}
+
+.paging__next {}
+
+.paging__spacer {
+  flex: 1;
+}

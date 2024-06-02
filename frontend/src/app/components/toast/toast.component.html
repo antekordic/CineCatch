@@ -1,3 +1,3 @@
-@for (message of messages(); track message.message) {
+@for (message of messages(); track $index) {
   <app-toast-message [message]="message" />
 }

@@ -1,12 +1,21 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import {filter, map, Observable, of, tap} from "rxjs";
-import {Movie} from "../interfaces/movie.interface";
-import {MOVIES_MOCK} from "../mocks/movies.mock";
-import {MOVIES_BY_ID_URL, MOVIES_URL} from "../shared/constants/urls";
-import { urlToHttpOptions } from 'node:url';
-
-
+import { HttpClient } from '@angular/common/http';
+import {map, Observable, of, switchMap} from "rxjs";
+import {
+  MOVIES_ADD_WATCH_LATER,
+  MOVIES_ADD_WATCHED,
+  MOVIES_BY_IDS,
+  MOVIES_BY_SEARCH_URL, MOVIES_DELETE_WATCH_LATER, MOVIES_DELETE_WATCHED, MOVIES_GET_WATCH_LATER, MOVIES_GET_WATCHED,
+  MOVIES_NEXT_POPULAR, MOVIES_RATE_WATCHED,
+} from "../shared/constants/urls";
+import {
+  AddToWatchedMovieDTO,
+  AddToWatchLaterMovieDTO,
+  MovieDetailDTO,
+  ResponseMessageDTO, ResponseMoviesDTO,
+  UpdateWatchedMovieRatingDTO
+} from "@movie-app/shared";
+import {observableToBeFn} from "rxjs/internal/testing/TestScheduler";
 
 @Injectable({
   providedIn: 'root'
@@ -15,39 +24,59 @@ export class MoviesService {
 
   private readonly http = inject(HttpClient)
 
-  public loadAllMovies(): Observable<Movie[]> {
-    return this.http.get<Movie[]>(MOVIES_URL);
+  public getNextPopularMovie(): Observable<MovieDetailDTO> {
+    return this.http.get<MovieDetailDTO>(MOVIES_NEXT_POPULAR);
   }
 
-  public loadWatchedMovies(): Observable<Movie[]> {
-    return this.loadAllMovies().pipe(
-      map(movies => movies.filter(movie => movie.watched))
-    )
+  public search(query: string, page = 1): Observable<MovieDetailDTO[]> {
+    return this.http.get<MovieDetailDTO[]>(
+      MOVIES_BY_SEARCH_URL
+        .replace(':query', query)
+        .replace(':page', `${page}`)
+    );
   }
 
-  public loadUnwatchedMovies(): Observable<Movie[]> {
-    return this.loadAllMovies().pipe(
-      map(movies => movies.filter(movie => !movie.watched))
-    )
+  public getMovieById(id: MovieDetailDTO['id']): Observable<MovieDetailDTO> {
+    return this.getMoviesByIds([id]).pipe(
+      map(movies => movies[0]),
+    );
   }
 
-  public search(query: string): Observable<Movie[]> {
-    return this.loadAllMovies().pipe(
-      map(movies => movies.filter(movie => movie.title.match(new RegExp(query, 'gi')))),
-    )
+  public getMoviesByIds(ids: MovieDetailDTO['id'][]): Observable<MovieDetailDTO[]> {
+    return this.http.get<MovieDetailDTO[]>(MOVIES_BY_IDS.replace(':ids', ids.join(',')));
   }
 
-  public getMovieById(movieId: Movie['id']): Observable<Movie | null> {
-    return this.http.get<Movie>(MOVIES_BY_ID_URL.replace(':id', movieId.toString()));
+  // Watched movies
+  public addToWatchedMovies(data: AddToWatchedMovieDTO): Observable<ResponseMessageDTO> {
+    return this.http.post<ResponseMessageDTO>(MOVIES_ADD_WATCHED, data);
   }
 
-   
-  public addMovieToWatchList(movie: Movie): Observable<Movie>{
-    return this.http.post<Movie>(MOVIES_BY_ID_URL, movie);
-  } 
+  public removeFromWatchedMovies(movieId: string): Observable<ResponseMessageDTO> {
+    return this.http.delete<ResponseMessageDTO>(MOVIES_DELETE_WATCHED.replace(':movieId', movieId));
+  }
 
+  public loadWatchedMovies(): Observable<MovieDetailDTO[]> {
+    return this.http.get<ResponseMoviesDTO>(MOVIES_GET_WATCHED).pipe(
+      map(({ movies }) => movies),
+    );;
+  }
 
-  public addRatingToMovie(movie: Movie): Observable<Movie>{
-    return this.http.post<Movie>(MOVIES_BY_ID_URL, movie);
+  public rateWatchedMovie(data: UpdateWatchedMovieRatingDTO): Observable<ResponseMessageDTO> {
+    return this.http.put<ResponseMessageDTO>(MOVIES_RATE_WATCHED, data);
+  }
+
+  // Want to watch later
+  public addToWatchLaterMovies(data: AddToWatchLaterMovieDTO): Observable<ResponseMessageDTO> {
+    return this.http.post<ResponseMessageDTO>(MOVIES_ADD_WATCH_LATER, data);
+  }
+
+  public loadWatchLaterMovies(): Observable<MovieDetailDTO[]> {
+    return this.http.get<ResponseMoviesDTO>(MOVIES_GET_WATCH_LATER).pipe(
+      map(({ movies }) => movies),
+    );
+  }
+
+  public deleteWatchlaterMovie(movieId: string): Observable<ResponseMessageDTO> {
+    return this.http.delete<ResponseMessageDTO>(MOVIES_DELETE_WATCH_LATER.replace(':movieId', movieId));
   }
 }

@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import {TinderComponent} from './pages/tinder/tinder.component';
+import {DashboardComponent} from './pages/dashboard/dashboard.component';
 import {MoviesComponent} from "./pages/movies/movies.component";
 import {SearchComponent} from "./pages/search/search.component";
 import {MovieComponent} from "./pages/movie/movie.component";
@@ -10,7 +10,7 @@ import {AuthType} from "./enums/auth-type.enum";
 
 export const routes: Routes = [{
   path: '',
-  component: TinderComponent,
+  component: DashboardComponent,
   canActivate: [authGuard],
   data: {
     authType: AuthType.Protected,

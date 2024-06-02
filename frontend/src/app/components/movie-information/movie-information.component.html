@@ -1,14 +1,28 @@
-<p>movie-information works!</p>
+<img class="poster" [src]="posterUrl" [alt]="movie.title" [title]="movie.title">
+<div class="details">
+  <h2 class="details__headline">{{ movie.title}}</h2>
+  <p class="details__overview">{{ movie.overview }}</p>
+  <div class="details__rating">
+    <app-rating-control [(ngModel)]="movie.user.rating" (ngModelChange)="updateRating()" />
+  </div>
+  <div class="details__spacer"></div>
+  <div class="details__buttons">
+    <div class="buttons__left">
+      @if (movie.user.watched) {
+        <button class="mv-button mv-button--cancel" (click)="removeFromWatchList()">✔ Watched</button>
+      } @else {
+        <button class="mv-button mv-button--submit" (click)="addToWatchList()">+ Watched</button>
+      }
 
-<h2> {{ movie.title}}</h2>
-<div class="box">
-    <div class="trailer">
-        <iframe width="560" height="315" [src]="youtubeUrl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      @if (movie.user.watchLater) {
+        <button class="mv-button mv-button--cancel" (click)="removeFromWatchLater()">✔ Bookmarked</button>
+      } @else {
+        <button class="mv-button mv-button--submit" (click)="addToWatchLater()">+ Bookmark</button>
+      }
     </div>
-
-    <div class="plot">
-        <h3>{{movie.genre}}, {{movie.director}} </h3> <br/>
-        {{movie.plot}}
+    <div class="buttons__right">
+      <ng-content select="[button][right]" />
     </div>
+  </div>
 </div>
 
