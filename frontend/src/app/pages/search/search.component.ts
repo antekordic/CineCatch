@@ -12,7 +12,7 @@ import {
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { MoviesService } from '../../services/movies.service';
-import { MovieDetailDTO } from '../../../../../shared';
+import { MovieDetailDTO } from '../../../../../backend/src/shared';
 import { MovieInformationComponent } from '../../components/movie-information/movie-information.component';
 import { ToastService } from '../../services/toast.service';
 

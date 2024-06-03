@@ -5,7 +5,7 @@ import { Movie } from '../../interfaces/movie.interface';
 import { MoviesService } from '../../services/movies.service';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { MovieInformationComponent } from '../../components/movie-information/movie-information.component';
-import { MovieDetailDTO } from '../../../../../shared';
+import { MovieDetailDTO } from '../../../../../backend/src/shared';
 
 @Component({
   selector: 'app-movie',

@@ -20,7 +20,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Movie } from '../../interfaces/movie.interface';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { response } from 'express';
-import { MovieDetailDTO } from '../../../../../shared';
+import { MovieDetailDTO } from '../../../../../backend/src/shared';
 import { ToastService } from '../../services/toast.service';
 import { RatingControlComponent } from '../../components/rating-control/rating-control.component';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';

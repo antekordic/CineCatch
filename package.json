@@ -1,6 +1,9 @@
 {
   "name": "cinemanias",
   "version": "1.0.0",
+  "engines": {
+    "node": ">=18 <20.9.0"
+  },
   "scripts": {
     "start": "cd backend/built && node server.js",
     "prebuild": "cd backend && npm run build",

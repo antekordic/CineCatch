@@ -11,7 +11,7 @@ import {
 } from 'rxjs';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { MoviesService } from '../../services/movies.service';
-import { MovieDetailDTO } from '../../../../../shared';
+import { MovieDetailDTO } from '../../../../../backend/src/shared';
 import { MovieFilterType } from '../../enums/movie-filter-type.enum';
 import { MovieInformationComponent } from '../../components/movie-information/movie-information.component';
 import { RatingControlComponent } from '../../components/rating-control/rating-control.component';
