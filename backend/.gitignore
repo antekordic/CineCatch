@@ -1,5 +1,6 @@
 node_modules
 .env
 builts
+built
 src/data/*
 src/routers/generate.session.secret.js

@@ -3,25 +3,27 @@ import { MovieComponent } from '../movie/movie.component';
 import {} from '@angular/common/http';
 import {
   BehaviorSubject,
-  distinctUntilChanged, filter,
+  distinctUntilChanged,
+  filter,
   map,
-  Observable, of,
+  Observable,
+  of,
   shareReplay,
   Subscription,
   switchMap,
   tap,
-  withLatestFrom
-} from "rxjs";
+  withLatestFrom,
+} from 'rxjs';
 import { MovieInformationComponent } from '../../components/movie-information/movie-information.component';
 import { MoviesService } from '../../services/movies.service';
 import { ActivatedRoute } from '@angular/router';
 import { Movie } from '../../interfaces/movie.interface';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { response } from 'express';
-import {MovieDetailDTO} from "@movie-app/shared";
-import {ToastService} from "../../services/toast.service";
-import {RatingControlComponent} from "../../components/rating-control/rating-control.component";
-import {FormControl, ReactiveFormsModule} from "@angular/forms";
+import { MovieDetailDTO } from '../../../../../backend/src/shared';
+import { ToastService } from '../../services/toast.service';
+import { RatingControlComponent } from '../../components/rating-control/rating-control.component';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
@@ -31,10 +33,10 @@ import {FormControl, ReactiveFormsModule} from "@angular/forms";
     JsonPipe,
     MovieInformationComponent,
     RatingControlComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent implements OnDestroy {
   private readonly subscription = new Subscription();
@@ -57,32 +59,36 @@ export class DashboardComponent implements OnDestroy {
   public watchLater(movie: MovieDetailDTO): void {
     const movieId = `${movie.id}`;
     this.subscription.add(
-      this.moviesService.addToWatchLaterMovies({ movieId }).pipe(
-        tap(() => this.showNextMovie()),
-      ).subscribe({
-        next: ({ message }) => this.toastService.addSuccess(message),
-        error: err => this.toastService.addError(err.message),
-      })
+      this.moviesService
+        .addToWatchLaterMovies({ movieId })
+        .pipe(tap(() => this.showNextMovie()))
+        .subscribe({
+          next: ({ message }) => this.toastService.addSuccess(message),
+          error: (err) => this.toastService.addError(err.message),
+        })
     );
   }
 
   public watched(movie: MovieDetailDTO): void {
     const movieId = `${movie.id}`;
-    const rating = this.ratingControl.value ? +this.ratingControl.value : undefined;
+    const rating = this.ratingControl.value
+      ? +this.ratingControl.value
+      : undefined;
 
     this.subscription.add(
-      this.moviesService.addToWatchedMovies({
-        movieId,
-        rating
-      }).subscribe({
-        next: ({ message }) => {
-          this.toastService.addSuccess(message);
-          this.showNextMovie();
-        },
-        error: error => this.toastService.addError(error.message),
-      })
-    )
-
+      this.moviesService
+        .addToWatchedMovies({
+          movieId,
+          rating,
+        })
+        .subscribe({
+          next: ({ message }) => {
+            this.toastService.addSuccess(message);
+            this.showNextMovie();
+          },
+          error: (error) => this.toastService.addError(error.message),
+        })
+    );
   }
 
   public showNextMovie(): void {
