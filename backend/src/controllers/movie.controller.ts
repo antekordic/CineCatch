@@ -12,7 +12,10 @@ import {
   HTTP_CREATED,
 } from "../constants/http_status";
 import { AuthRequest } from "../middleware/auth.middleware";
-import { MovieDetailDTO, MovieUserContextDTO } from "../shared/dtos/movie.dto";
+import {
+  MovieDetailDTO,
+  MovieUserContextDTO,
+} from "../../../shared/dtos/movie.dto";
 
 // Function to fetch movie details from TMDB
 const fetchMovieDetails = async (

@@ -9,7 +9,7 @@ import {
 import { Movie } from '../../interfaces/movie.interface';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { MovieDetailDTO } from '../../../../../backend/src/shared';
+import { MovieDetailDTO } from '../../../../../shared';
 import { BASE_IMAGE_URL } from '../../tokens/base-image-url.token';
 import { MoviesService } from '../../services/movies.service';
 import { Subscription } from 'rxjs';

@@ -20,7 +20,7 @@ import {
   ResponseMessageDTO,
   ResponseMoviesDTO,
   UpdateWatchedMovieRatingDTO,
-} from '../../../../backend/src/shared';
+} from '../../../../shared';
 import { observableToBeFn } from 'rxjs/internal/testing/TestScheduler';
 
 @Injectable({

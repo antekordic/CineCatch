@@ -9,7 +9,7 @@ import {
   AddToWatchedMovieDTO,
   AddToWatchLaterMovieDTO,
   UpdateWatchedMovieRatingDTO,
-} from "../shared/dtos/user.dto";
+} from "../../../shared/dtos/user.dto";
 import {
   HTTP_UNAUTHORIZED,
   HTTP_FORBIDDEN,
