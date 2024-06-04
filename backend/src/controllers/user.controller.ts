@@ -9,7 +9,7 @@ import {
   AddToWatchedMovieDTO,
   AddToWatchLaterMovieDTO,
   UpdateWatchedMovieRatingDTO,
-} from "../../../shared/dtos/user.dto";
+} from "../shared/dtos/user.dto";
 import {
   HTTP_UNAUTHORIZED,
   HTTP_FORBIDDEN,
@@ -244,7 +244,10 @@ export const updateWatchedMovieRating = async (
 };
 
 // Delete a movie from the watched list
-export const deleteWatchedMovie = async (req: AuthRequest & { params: { movieId: string } }, res: Response) => {
+export const deleteWatchedMovie = async (
+  req: AuthRequest & { params: { movieId: string } },
+  res: Response
+) => {
   try {
     const { movieId }: { movieId: string } = req.params;
     const user = await UserModel.findById(req.user!.id);
@@ -281,8 +284,8 @@ export const deleteWatchedMovie = async (req: AuthRequest & { params: { movieId:
 
 // Delete a movie from the watch later list
 export const deleteWatchLaterMovie = async (
-    req: AuthRequest & { params: { movieId: string } },
-    res: Response
+  req: AuthRequest & { params: { movieId: string } },
+  res: Response
 ) => {
   try {
     const { movieId }: { movieId: string } = req.params;

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import fetch from "node-fetch";
-import {UserDocument, UserModel} from "../models/user.model";
+import { UserDocument, UserModel } from "../models/user.model";
 import {
   HTTP_NO_CONTENT,
   HTTP_BAD_REQUEST,
@@ -12,7 +12,7 @@ import {
   HTTP_CREATED,
 } from "../constants/http_status";
 import { AuthRequest } from "../middleware/auth.middleware";
-import {MovieDetailDTO, MovieUserContextDTO} from "../../../shared/dtos/movie.dto";
+import { MovieDetailDTO, MovieUserContextDTO } from "../shared/dtos/movie.dto";
 
 // Function to fetch movie details from TMDB
 const fetchMovieDetails = async (
@@ -46,33 +46,42 @@ const fetchMovieDetails = async (
   );
 
   // Filter out any null values
-  return Promise.all(movieDetails.filter(
-    (movie): movie is MovieDetailDTO => movie !== null
-  ).map(async (movie) => {
-    if (!user) {
-      return movie;
-    }
+  return Promise.all(
+    movieDetails
+      .filter((movie): movie is MovieDetailDTO => movie !== null)
+      .map(async (movie) => {
+        if (!user) {
+          return movie;
+        }
 
-    return addUserContext(movie, user);
-  }));
-
-
+        return addUserContext(movie, user);
+      })
+  );
 };
 
-export const addUserContext = async (movie: MovieDetailDTO, user: UserDocument): Promise<MovieDetailDTO & MovieUserContextDTO> => {
-  const watched = !!user.watchedMovies.find(({movieId}) => movieId === movie.id.toString());
-  const watchLater = !!user.watchLaterMovies.find(watchLaterMovieId => watchLaterMovieId === movie.id.toString());
-  const rating = user.watchedMovies.find(({movieId}) => movieId === movie.id.toString())?.rating || 0;
+export const addUserContext = async (
+  movie: MovieDetailDTO,
+  user: UserDocument
+): Promise<MovieDetailDTO & MovieUserContextDTO> => {
+  const watched = !!user.watchedMovies.find(
+    ({ movieId }) => movieId === movie.id.toString()
+  );
+  const watchLater = !!user.watchLaterMovies.find(
+    (watchLaterMovieId) => watchLaterMovieId === movie.id.toString()
+  );
+  const rating =
+    user.watchedMovies.find(({ movieId }) => movieId === movie.id.toString())
+      ?.rating || 0;
 
   return {
     ...movie,
     user: {
       watched,
       watchLater,
-      rating
-    }
-  }
-}
+      rating,
+    },
+  };
+};
 
 // Controller to get the next popular movie for a user
 export const getNextPopularMovie = async (req: AuthRequest, res: Response) => {
@@ -104,7 +113,10 @@ export const getNextPopularMovie = async (req: AuthRequest, res: Response) => {
     const nextMovie = data.results[movieIndex];
 
     // Fetch additional details for the next movie
-    const detailedMovie = await fetchMovieDetails([nextMovie.id.toString()], user);
+    const detailedMovie = await fetchMovieDetails(
+      [nextMovie.id.toString()],
+      user
+    );
 
     // Update user data
     user.currentPage =
@@ -157,7 +169,7 @@ export const searchMovies = async (req: AuthRequest, res: Response) => {
 
     const movies: MovieDetailDTO[] = await fetchMovieDetails(
       (data.results || []).map((movie: any) => movie.id.toString()),
-        user
+      user
     );
 
     res.status(HTTP_OK).json(movies);

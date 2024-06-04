@@ -21,10 +21,18 @@ app.use(cors({ credentials: true, origin: ["http://localhost:4200"] }));
 app.use("/api/movies", movieRouter);
 app.use("/api/users", userRouter);
 
-app.use(express.static("public"));
+// Serve static files from the 'public/browser' directory
+app.use(express.static(path.join(__dirname, "public", "browser")));
+
+// Send all other requests to the Angular app
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "browser", "index.html"));
 });
+
+// app.use(express.static("public"));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "public", "index.html"));
+// });
 
 const port = process.env.PORT || 4201;
 app.listen(port, () => {

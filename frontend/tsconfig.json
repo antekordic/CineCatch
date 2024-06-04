@@ -18,12 +18,9 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
+    "lib": ["ES2022", "dom"],
     "paths": {
-      "@movie-app/shared": ["../shared/index.ts"],
+      "@movie-app/shared": ["../backend/src/shared/index.ts"]
     }
   },
   "angularCompilerOptions": {
