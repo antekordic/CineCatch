@@ -1,0 +1,12 @@
+{
+  "name": "cinephilecompanion",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=18 <20.9.0"
+  },
+  "scripts": {
+    "start": "cd backend/built/backend/src/ && node server.js",
+    "prebuild": "cd backend && npm run build",
+    "build": "cd frontend && npm run build"
+  }
+}
