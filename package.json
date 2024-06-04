@@ -2,7 +2,7 @@
   "name": "cinephilecompanion",
   "version": "1.0.0",
   "engines": {
-    "node": ">=18.3 <19"
+    "node": ">=18.19 <19"
   },
   "scripts": {
     "start": "cd backend/built/ && node server.js",
