@@ -9,15 +9,15 @@
   <div class="details__buttons">
     <div class="buttons__left">
       @if (movie.user.watched) {
-        <button class="mv-button mv-button--cancel" (click)="removeFromWatchList()">✔ Watched</button>
+      <button class="mv-button mv-button--cancel" (click)="removeFromWatchList()">✔ Watched</button>
       } @else {
-        <button class="mv-button mv-button--submit" (click)="addToWatchList()">+ Watched</button>
+      <button class="mv-button mv-button--submit" (click)="addToWatchList()">+ Watched</button>
       }
 
       @if (movie.user.watchLater) {
-        <button class="mv-button mv-button--cancel" (click)="removeFromWatchLater()">✔ Bookmarked</button>
+      <button class="mv-button mv-button--cancel" (click)="removeFromWatchLater()">✔ Bookmarked</button>
       } @else {
-        <button class="mv-button mv-button--submit" (click)="addToWatchLater()">+ Bookmark</button>
+      <button class="mv-button mv-button--submit" (click)="addToWatchLater()">+ Bookmark</button>
       }
     </div>
     <div class="buttons__right">
@@ -25,4 +25,3 @@
     </div>
   </div>
 </div>
-
