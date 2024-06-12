@@ -1,12 +1,10 @@
-<h1>CineCatch</h1>
-
+<div class="container">
+  <img src="assets/logo.png" width="100px">
+  <h1> CineCatch</h1>
+</div>
 @if (loggedIn$ | async) {
 <form [formGroup]="searchForm" (ngSubmit)="submitSearchQuery()">
-  <input
-    type="text"
-    formControlName="query"
-    placeholder="What are you looking for..."
-  />
+  <input type="text" formControlName="query" placeholder="What are you looking for..." />
   <button [disabled]="searchForm.invalid" type="submit">Search</button>
 </form>
 }

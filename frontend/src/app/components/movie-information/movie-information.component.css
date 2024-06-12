@@ -3,6 +3,7 @@
   position: relative;
   flex-direction: row;
   margin-top: var(--spacing-default-double);
+  flex-wrap: wrap;
 }
 
 .poster {
@@ -27,6 +28,7 @@
   margin-top: 0;
   margin-bottom: var(--spacing-default-double);
   line-height: 1.5rem;
+  padding-right: 10px;
 }
 
 .details__rating {
@@ -45,4 +47,7 @@
 }
 
 .buttons__left {}
-.buttons__right {}
+
+.buttons__right {
+  padding-right: 10px;
+}
